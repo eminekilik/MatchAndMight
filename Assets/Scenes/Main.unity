@@ -158,7 +158,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 2
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0.89742255, g: 0.90209365, b: 0.90943396, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -243,14 +243,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7eca8fc299780c409dbecaa0bd851d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 6
-  height: 6
+  width: 3
+  height: 2
   tileSize: 1
   tilePrefab: {fileID: 8004888151849008632, guid: f1c42e9ddb4b7e74aa1f169a3e51ada4, type: 3}
   gemPrefabs:
   - {fileID: 448025075340840488, guid: 52138d184d8ce8e47ae985205c0c6e6a, type: 3}
   - {fileID: 3712457713774026290, guid: 42d883cfdd552654dbab18e202ce8d43, type: 3}
   - {fileID: 1558816947045966793, guid: e5c337e5894df97468761a7a6e7a4c6a, type: 3}
+  swapDuration: 0.15
 --- !u!4 &1088039118
 Transform:
   m_ObjectHideFlags: 0
