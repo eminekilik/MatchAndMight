@@ -20,7 +20,6 @@ public class BoardManager : MonoBehaviour
     public float swapDuration = 0.15f;
     bool isSwapping = false;
 
-
     void Awake()
     {
         Instance = this;
@@ -76,24 +75,11 @@ public class BoardManager : MonoBehaviour
             gemPrefab,
             tiles[x, y].transform.position,
             Quaternion.identity,
-            tiles[x, y].transform   // ?? parent burasý
+            tiles[x, y].transform
         );
 
         gem.currentTile = tiles[x, y];
         tiles[x, y].currentGem = gem;
-    }
-
-    public void SelectGem(Gem gem)
-    {
-        if (selectedGem == null)
-        {
-            selectedGem = gem;
-            Debug.Log("Gem seçildi");
-            return;
-        }
-
-        TrySwap(selectedGem, gem);
-        selectedGem = null;
     }
 
     void TrySwap(Gem a, Gem b)
@@ -101,7 +87,6 @@ public class BoardManager : MonoBehaviour
         int dx = Mathf.Abs(a.currentTile.x - b.currentTile.x);
         int dy = Mathf.Abs(a.currentTile.y - b.currentTile.y);
 
-        // sadece yan yanaysa
         if (dx + dy == 1)
         {
             SwapGems(a, b);
@@ -111,10 +96,10 @@ public class BoardManager : MonoBehaviour
     void SwapGems(Gem a, Gem b)
     {
         if (isSwapping) return;
-        StartCoroutine(SwapCoroutine(a, b));
+        StartCoroutine(SwapCoroutine(a, b, true));
     }
 
-    IEnumerator SwapCoroutine(Gem a, Gem b)
+    IEnumerator SwapCoroutine(Gem a, Gem b, bool checkMatch)
     {
         isSwapping = true;
 
@@ -134,20 +119,32 @@ public class BoardManager : MonoBehaviour
             yield return null;
         }
 
-        // parent deðiþtir
         a.transform.SetParent(tileB.transform);
         b.transform.SetParent(tileA.transform);
 
-        // kesin pozisyon
         a.transform.position = posB;
         b.transform.position = posA;
 
-        // referanslarý güncelle
         a.currentTile = tileB;
         b.currentTile = tileA;
 
         tileA.currentGem = b;
         tileB.currentGem = a;
+
+        if (checkMatch)
+        {
+            bool aMatch = MatchManager.Instance.HasMatchAt(tileA);
+            bool bMatch = MatchManager.Instance.HasMatchAt(tileB);
+
+            if (!aMatch && !bMatch)
+            {
+                isSwapping = false;
+                StartCoroutine(SwapCoroutine(a, b, false)); // ?? geri al ama tekrar kontrol etme
+                yield break;
+            }
+
+            MatchDestroyer.Instance.ResolveMatches();
+        }
 
         isSwapping = false;
     }
@@ -173,5 +170,11 @@ public class BoardManager : MonoBehaviour
         }
     }
 
+    public Tile GetTile(int x, int y)
+    {
+        return tiles[x, y];
+    }
 
+    public int Width => width;
+    public int Height => height;
 }
