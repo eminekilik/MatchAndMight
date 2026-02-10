@@ -32,7 +32,8 @@ public class MatchDestroyer : MonoBehaviour
         yield return new WaitForSeconds(0.25f);
 
         // ?? burada ileride gravity çaðýracaðýz
-        // GravityManager.Instance.ApplyGravity();
+        GravityManager.Instance.ApplyGravity();
+
     }
 
     IEnumerator DestroyGem(Gem gem)

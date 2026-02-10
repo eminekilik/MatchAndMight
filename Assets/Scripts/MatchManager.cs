@@ -108,4 +108,10 @@ public class MatchManager : MonoBehaviour
 
         return matches.Distinct().ToList();
     }
+
+    public bool HasAnyMatch()
+    {
+        return GetAllMatches().Count > 0;
+    }
+
 }
