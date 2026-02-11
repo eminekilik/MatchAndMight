@@ -23,6 +23,27 @@ public class MatchDestroyer : MonoBehaviour
 
     IEnumerator DestroyMatchesCoroutine(List<Gem> matches)
     {
+        // -------- COMBAT HESABI --------
+        Dictionary<GemType, int> matchCounts = new Dictionary<GemType, int>();
+
+        foreach (Gem gem in matches)
+        {
+            if (gem == null) continue;
+
+            if (!matchCounts.ContainsKey(gem.gemType))
+                matchCounts[gem.gemType] = 0;
+
+            matchCounts[gem.gemType]++;
+        }
+
+        foreach (var pair in matchCounts)
+        {
+            CombatManager.Instance.OnMatch(pair.Key, pair.Value);
+        }
+        // -------- COMBAT HESABI BÝTTÝ --------
+
+
+        // Animasyon + destroy
         foreach (Gem gem in matches)
         {
             if (gem != null)
@@ -31,10 +52,9 @@ public class MatchDestroyer : MonoBehaviour
 
         yield return new WaitForSeconds(0.25f);
 
-        // ?? burada ileride gravity çaðýracaðýz
         GravityManager.Instance.ApplyGravity();
-
     }
+
 
     IEnumerator DestroyGem(Gem gem)
     {
