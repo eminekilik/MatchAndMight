@@ -5,7 +5,7 @@ public class GravityManager : MonoBehaviour
 {
     public static GravityManager Instance;
 
-    BoardManager board;
+    private BoardManager board;
 
     void Awake()
     {
@@ -22,7 +22,7 @@ public class GravityManager : MonoBehaviour
         StartCoroutine(GravityCoroutine());
     }
 
-    IEnumerator GravityCoroutine()
+    private IEnumerator GravityCoroutine()
     {
         bool moved;
 
@@ -51,24 +51,21 @@ public class GravityManager : MonoBehaviour
 
         SpawnNewGems();
 
-        yield return new WaitForSeconds(0.2f);
+        yield return new WaitForSeconds(0.25f);
 
-        // 1?? once match var mi
         if (MatchManager.Instance.HasAnyMatch())
         {
             MatchDestroyer.Instance.ResolveMatches();
-
             yield break;
         }
 
-        // 2?? match yoksa hamle var mi
-        if (!BoardManager.Instance.HasPossibleMove())
+        if (!BoardRuleChecker.Instance.HasPossibleMove())
         {
-            BoardManager.Instance.ShuffleBoard();
+            board.ShuffleBoard();
         }
     }
 
-    void MoveGemDown(Gem gem, Tile targetTile)
+    private void MoveGemDown(Gem gem, Tile targetTile)
     {
         Tile fromTile = gem.currentTile;
 
@@ -81,7 +78,7 @@ public class GravityManager : MonoBehaviour
         StartCoroutine(MoveAnimation(gem, targetTile.transform.position));
     }
 
-    IEnumerator MoveAnimation(Gem gem, Vector3 targetPos)
+    private IEnumerator MoveAnimation(Gem gem, Vector3 targetPos)
     {
         Vector3 startPos = gem.transform.position;
         float t = 0f;
@@ -96,7 +93,7 @@ public class GravityManager : MonoBehaviour
         gem.transform.position = targetPos;
     }
 
-    void SpawnNewGems()
+    private void SpawnNewGems()
     {
         for (int x = 0; x < board.Width; x++)
         {

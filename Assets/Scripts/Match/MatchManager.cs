@@ -6,7 +6,7 @@ public class MatchManager : MonoBehaviour
 {
     public static MatchManager Instance;
 
-    BoardManager board;
+    private BoardManager board;
 
     void Awake()
     {
@@ -33,58 +33,40 @@ public class MatchManager : MonoBehaviour
         GemType type = tile.currentGem.gemType;
 
         // YATAY
-        List<Gem> horizontal = new List<Gem>();
-        horizontal.Add(tile.currentGem);
-
-        int x = tile.x - 1;
-        while (x >= 0)
+        List<Gem> horizontal = new List<Gem> { tile.currentGem };
+        for (int x = tile.x - 1; x >= 0; x--)
         {
             Tile t = board.GetTile(x, tile.y);
             if (t.currentGem != null && t.currentGem.gemType == type)
                 horizontal.Add(t.currentGem);
             else break;
-            x--;
         }
-
-        x = tile.x + 1;
-        while (x < board.Width)
+        for (int x = tile.x + 1; x < board.Width; x++)
         {
             Tile t = board.GetTile(x, tile.y);
             if (t.currentGem != null && t.currentGem.gemType == type)
                 horizontal.Add(t.currentGem);
             else break;
-            x++;
         }
-
-        if (horizontal.Count >= 3)
-            result.AddRange(horizontal);
+        if (horizontal.Count >= 3) result.AddRange(horizontal);
 
         // DÝKEY
-        List<Gem> vertical = new List<Gem>();
-        vertical.Add(tile.currentGem);
-
-        int y = tile.y - 1;
-        while (y >= 0)
+        List<Gem> vertical = new List<Gem> { tile.currentGem };
+        for (int y = tile.y - 1; y >= 0; y--)
         {
             Tile t = board.GetTile(tile.x, y);
             if (t.currentGem != null && t.currentGem.gemType == type)
                 vertical.Add(t.currentGem);
             else break;
-            y--;
         }
-
-        y = tile.y + 1;
-        while (y < board.Height)
+        for (int y = tile.y + 1; y < board.Height; y++)
         {
             Tile t = board.GetTile(tile.x, y);
             if (t.currentGem != null && t.currentGem.gemType == type)
                 vertical.Add(t.currentGem);
             else break;
-            y++;
         }
-
-        if (vertical.Count >= 3)
-            result.AddRange(vertical);
+        if (vertical.Count >= 3) result.AddRange(vertical);
 
         return result.Distinct().ToList();
     }
@@ -101,8 +83,7 @@ public class MatchManager : MonoBehaviour
                 if (tile.currentGem == null) continue;
 
                 var match = GetMatchAt(tile);
-                if (match.Count >= 3)
-                    matches.AddRange(match);
+                if (match.Count >= 3) matches.AddRange(match);
             }
         }
 
@@ -113,5 +94,4 @@ public class MatchManager : MonoBehaviour
     {
         return GetAllMatches().Count > 0;
     }
-
 }

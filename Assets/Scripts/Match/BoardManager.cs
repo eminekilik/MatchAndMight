@@ -1,11 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class BoardManager : MonoBehaviour
 {
     public static BoardManager Instance;
-    private Gem selectedGem;
 
     [Header("Board Size")]
     public int width = 6;
@@ -19,9 +19,7 @@ public class BoardManager : MonoBehaviour
     private Tile[,] tiles;
 
     public float swapDuration = 0.15f;
-    bool isSwapping = false;
-    bool isShuffling = false;
-
+    private bool isShuffling;
 
     void Awake()
     {
@@ -34,12 +32,18 @@ public class BoardManager : MonoBehaviour
         SpawnInitialGems();
     }
 
+    #region Board Creation
     void CreateBoard()
     {
         tiles = new Tile[width, height];
 
-        float xOffset = (width - 1) * tileSize / 2f;
-        float yOffset = (height - 1) * tileSize / 2f;
+        float boardWidth = (width - 1) * tileSize;
+        float xOffset = boardWidth / 2f;
+        float bottomPadding = 1f;
+
+        float cameraBottom = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0)).y;
+
+        float startY = cameraBottom + (tileSize / 2f) + bottomPadding;
 
         for (int x = 0; x < width; x++)
         {
@@ -47,7 +51,7 @@ public class BoardManager : MonoBehaviour
             {
                 Vector2 position = new Vector2(
                     x * tileSize - xOffset,
-                    y * tileSize - yOffset
+                    startY + y * tileSize
                 );
 
                 Tile tile = Instantiate(tilePrefab, position, Quaternion.identity, transform);
@@ -58,40 +62,79 @@ public class BoardManager : MonoBehaviour
             }
         }
     }
+    #endregion
 
+    #region Gem Spawning
     void SpawnInitialGems()
     {
         for (int x = 0; x < width; x++)
-        {
             for (int y = 0; y < height; y++)
-            {
-                // sadece üstten spawn et, tile’a yerleþtirme
                 SpawnGemFromTop(x, y);
-            }
-        }
 
-        // board kendi kendini çözsün
         StartCoroutine(StartBoardResolve());
     }
 
     IEnumerator StartBoardResolve()
     {
-        // spawn animasyonlarýnýn baþlamasýna izin ver
         yield return new WaitForSeconds(0.2f);
-
         GravityManager.Instance.ApplyGravity();
+    }
+
+    public void SpawnGemFromTop(int x, int y)
+    {
+        Gem prefab = gemPrefabs[Random.Range(0, gemPrefabs.Length)];
+        Vector3 spawnPos = GetTile(x, height - 1).transform.position + Vector3.up * tileSize;
+
+        Gem gem = Instantiate(prefab, spawnPos, Quaternion.identity, GetTile(x, y).transform);
+
+        gem.currentTile = GetTile(x, y);
+        GetTile(x, y).currentGem = gem;
+
+        StartCoroutine(MoveNewGem(gem, GetTile(x, y).transform.position));
+    }
+
+    IEnumerator MoveNewGem(Gem gem, Vector3 targetPos)
+    {
+        Vector3 startPos = gem.transform.position;
+        float t = 0f;
+
+        while (t < 1f)
+        {
+            t += Time.deltaTime * 8f;
+            gem.transform.position = Vector3.Lerp(startPos, targetPos, t);
+            yield return null;
+        }
+
+        gem.transform.position = targetPos;
+    }
+    #endregion
+
+    #region Swap
+    public void TrySwapFromDirection(Gem gem, Vector2 dir)
+    {
+        int targetX = gem.currentTile.x;
+        int targetY = gem.currentTile.y;
+
+        if (dir == Vector2.right) targetX++;
+        if (dir == Vector2.left) targetX--;
+        if (dir == Vector2.up) targetY++;
+        if (dir == Vector2.down) targetY--;
+
+        if (targetX < 0 || targetX >= width || targetY < 0 || targetY >= height)
+            return;
+
+        Gem otherGem = tiles[targetX, targetY].currentGem;
+        if (otherGem != null)
+            SwapGems(gem, otherGem);
     }
 
     void SwapGems(Gem a, Gem b)
     {
-        if (isSwapping) return;
         StartCoroutine(SwapCoroutine(a, b, true));
     }
 
     IEnumerator SwapCoroutine(Gem a, Gem b, bool checkMatch)
     {
-        isSwapping = true;
-
         Tile tileA = a.currentTile;
         Tile tileB = b.currentTile;
 
@@ -121,82 +164,17 @@ public class BoardManager : MonoBehaviour
         tileB.currentGem = a;
 
         if (checkMatch)
-        {
-            bool aMatch = MatchManager.Instance.HasMatchAt(tileA);
-            bool bMatch = MatchManager.Instance.HasMatchAt(tileB);
-
-            if (!aMatch && !bMatch)
-            {
-                isSwapping = false;
-                StartCoroutine(SwapCoroutine(a, b, false)); // ?? geri al ama tekrar kontrol etme
-                yield break;
-            }
-
             MatchDestroyer.Instance.ResolveMatches();
-        }
-
-        isSwapping = false;
     }
+    #endregion
 
-    public void TrySwapFromDirection(Gem gem, Vector2 dir)
-    {
-        int targetX = gem.currentTile.x;
-        int targetY = gem.currentTile.y;
-
-        if (dir == Vector2.right) targetX++;
-        if (dir == Vector2.left) targetX--;
-        if (dir == Vector2.up) targetY++;
-        if (dir == Vector2.down) targetY--;
-
-        if (targetX < 0 || targetX >= width || targetY < 0 || targetY >= height)
-            return;
-
-        Gem otherGem = tiles[targetX, targetY].currentGem;
-
-        if (otherGem != null)
-        {
-            SwapGems(gem, otherGem);
-        }
-    }
-
-    public Tile GetTile(int x, int y)
-    {
-        return tiles[x, y];
-    }
-
+    #region Tile Access
+    public Tile GetTile(int x, int y) => tiles[x, y];
     public int Width => width;
     public int Height => height;
+    #endregion
 
-    public void SpawnGemFromTop(int x, int y)
-    {
-        Gem prefab = gemPrefabs[Random.Range(0, gemPrefabs.Length)];
-
-        Vector3 spawnPos = GetTile(x, height - 1).transform.position + Vector3.up * tileSize;
-
-        Gem gem = Instantiate(prefab, spawnPos, Quaternion.identity, GetTile(x, y).transform);
-
-        gem.currentTile = GetTile(x, y);
-        GetTile(x, y).currentGem = gem;
-
-        StartCoroutine(MoveNewGem(gem, GetTile(x, y).transform.position));
-    }
-
-    IEnumerator MoveNewGem(Gem gem, Vector3 targetPos)
-    {
-        Vector3 startPos = gem.transform.position;
-        float t = 0f;
-
-        while (t < 1f)
-        {
-            t += Time.deltaTime * 8f;
-            gem.transform.position = Vector3.Lerp(startPos, targetPos, t);
-            yield return null;
-        }
-
-        gem.transform.position = targetPos;
-    }
-
-
+    #region Board Checks / Shuffle
     public bool HasPossibleMove()
     {
         for (int x = 0; x < width; x++)
@@ -206,15 +184,11 @@ public class BoardManager : MonoBehaviour
                 Gem gem = tiles[x, y].currentGem;
                 if (gem == null) continue;
 
-                // sag
-                if (x < width - 1)
-                    if (CheckSwapForMatch(tiles[x, y], tiles[x + 1, y]))
-                        return true;
+                if (x < width - 1 && CheckSwapForMatch(tiles[x, y], tiles[x + 1, y]))
+                    return true;
 
-                // yukari
-                if (y < height - 1)
-                    if (CheckSwapForMatch(tiles[x, y], tiles[x, y + 1]))
-                        return true;
+                if (y < height - 1 && CheckSwapForMatch(tiles[x, y], tiles[x, y + 1]))
+                    return true;
             }
         }
         return false;
@@ -222,10 +196,8 @@ public class BoardManager : MonoBehaviour
 
     bool CheckSwapForMatch(Tile a, Tile b)
     {
-        if (a.currentGem == null || b.currentGem == null)
-            return false;
+        if (a.currentGem == null || b.currentGem == null) return false;
 
-        // sahte swap
         Gem gemA = a.currentGem;
         Gem gemB = b.currentGem;
 
@@ -235,14 +207,10 @@ public class BoardManager : MonoBehaviour
         gemA.currentTile = b;
         gemB.currentTile = a;
 
-        bool hasMatch =
-            MatchManager.Instance.HasMatchAt(a) ||
-            MatchManager.Instance.HasMatchAt(b);
+        bool hasMatch = MatchManager.Instance.HasMatchAt(a) || MatchManager.Instance.HasMatchAt(b);
 
-        // geri al
         a.currentGem = gemA;
         b.currentGem = gemB;
-
         gemA.currentTile = a;
         gemB.currentTile = b;
 
@@ -346,7 +314,7 @@ public class BoardManager : MonoBehaviour
     {
         float duration = 0.4f;
         float strength = 0.05f;   // daha hafif
-        float frequency = 18f;    // sallanma hýzý
+        float frequency = 18f;    // sallanma h?z?
 
         Dictionary<Gem, Vector3> startPos = new Dictionary<Gem, Vector3>();
         Dictionary<Gem, float> phaseOffset = new Dictionary<Gem, float>();
@@ -371,7 +339,7 @@ public class BoardManager : MonoBehaviour
             t += Time.deltaTime;
             float normalized = t / duration;
 
-            // baþta güçlü, sonda yavaþça sönsün
+            // ba?ta güçlü, sonda yava?ça sönsün
             float damp = Mathf.Sin(normalized * Mathf.PI);
 
             foreach (var gem in startPos.Keys)
@@ -390,6 +358,5 @@ public class BoardManager : MonoBehaviour
             pair.Key.transform.position = pair.Value;
     }
 
-
+    #endregion
 }
-

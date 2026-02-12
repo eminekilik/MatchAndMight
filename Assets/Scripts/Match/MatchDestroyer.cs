@@ -6,6 +6,9 @@ public class MatchDestroyer : MonoBehaviour
 {
     public static MatchDestroyer Instance;
 
+    public System.Action<Dictionary<GemType, int>> OnMatchesResolved;
+    public System.Action OnResolveFinished;
+
     void Awake()
     {
         Instance = this;
@@ -13,17 +16,26 @@ public class MatchDestroyer : MonoBehaviour
 
     public void ResolveMatches()
     {
-        List<Gem> matches = MatchManager.Instance.GetAllMatches();
-
-        if (matches.Count == 0)
-            return;
-
-        StartCoroutine(DestroyMatchesCoroutine(matches));
+        StartCoroutine(ResolveLoop());
     }
 
-    IEnumerator DestroyMatchesCoroutine(List<Gem> matches)
+    private IEnumerator ResolveLoop()
     {
-        // -------- COMBAT HESABI --------
+        while (true)
+        {
+            List<Gem> matches = MatchManager.Instance.GetAllMatches();
+            if (matches.Count == 0) break;
+
+            yield return StartCoroutine(DestroyMatchesCoroutine(matches));
+            yield return new WaitForSeconds(0.15f);
+        }
+
+        OnResolveFinished?.Invoke();
+    }
+
+    private IEnumerator DestroyMatchesCoroutine(List<Gem> matches)
+    {
+        matches = new List<Gem>(new HashSet<Gem>(matches));
         Dictionary<GemType, int> matchCounts = new Dictionary<GemType, int>();
 
         foreach (Gem gem in matches)
@@ -36,14 +48,8 @@ public class MatchDestroyer : MonoBehaviour
             matchCounts[gem.gemType]++;
         }
 
-        foreach (var pair in matchCounts)
-        {
-            CombatManager.Instance.OnMatch(pair.Key, pair.Value);
-        }
-        // -------- COMBAT HESABI BÝTTÝ --------
+        OnMatchesResolved?.Invoke(matchCounts);
 
-
-        // Animasyon + destroy
         foreach (Gem gem in matches)
         {
             if (gem != null)
@@ -51,25 +57,30 @@ public class MatchDestroyer : MonoBehaviour
         }
 
         yield return new WaitForSeconds(0.25f);
-
         GravityManager.Instance.ApplyGravity();
+        yield return new WaitForSeconds(0.25f);
     }
 
-
-    IEnumerator DestroyGem(Gem gem)
+    private IEnumerator DestroyGem(Gem gem)
     {
+        if (gem == null) yield break;
+
         float t = 0f;
         Vector3 startScale = gem.transform.localScale;
 
         while (t < 1f)
         {
+            if (gem == null) yield break;
+
             t += Time.deltaTime * 6f;
             gem.transform.localScale = Vector3.Lerp(startScale, Vector3.zero, t);
             yield return null;
         }
 
-        Tile tile = gem.currentTile;
-        tile.currentGem = null;
+        if (gem == null) yield break;
+
+        if (gem.currentTile != null)
+            gem.currentTile.currentGem = null;
 
         Destroy(gem.gameObject);
     }
