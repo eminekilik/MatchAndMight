@@ -42,6 +42,20 @@ public class CombatManager : MonoBehaviour
     [Header("Turn UI")]
     public TMP_Text turnText;
 
+    [Header("UI References")]
+    public RectTransform playerHPBarRect;
+    public RectTransform enemyHPBarRect;
+    public Canvas canvas;
+    public Camera mainCamera;
+
+    [Header("Impact Settings")]
+    public float flashDuration = 0.12f;
+    public float flashScaleAmount = 1.05f;
+
+    [Header("Screen Impact")]
+    public Image screenFlashImage; // full screen beyaz image
+
+
     void Awake()
     {
         Instance = this;
@@ -69,9 +83,7 @@ public class CombatManager : MonoBehaviour
             return;
 
         foreach (var pair in matchCounts)
-        {
             OnMatch(pair.Key, pair.Value);
-        }
     }
 
     void HandleResolveFinished()
@@ -79,7 +91,6 @@ public class CombatManager : MonoBehaviour
         if (currentState == CombatState.PlayerTurn)
             EndPlayerTurn();
     }
-
 
     void SetupSliders()
     {
@@ -100,7 +111,6 @@ public class CombatManager : MonoBehaviour
             turnText.text = "YOU LOSE";
     }
 
-    // MATCH GELDÝÐÝNDE ÇALIÞIR
     public void OnMatch(GemType type, int count)
     {
         if (currentState != CombatState.PlayerTurn)
@@ -111,11 +121,9 @@ public class CombatManager : MonoBehaviour
             case GemType.Red:
                 enemyHP -= count * redDamage;
                 break;
-
             case GemType.Blue:
                 playerMana += count * blueMana;
                 break;
-
             case GemType.Green:
                 playerHP += count * greenHeal;
                 break;
@@ -140,13 +148,12 @@ public class CombatManager : MonoBehaviour
         enemyHPBar.value = enemyHP;
     }
 
-    // PLAYER TURNU BÝTTÝÐÝNDE ÇAÐIR
     public void EndPlayerTurn()
     {
         if (currentState != CombatState.PlayerTurn)
             return;
 
-        currentState = CombatState.Busy;   // ?? önemli
+        currentState = CombatState.Busy;
         UpdateTurnUI();
 
         CheckCombatEnd();
@@ -176,6 +183,10 @@ public class CombatManager : MonoBehaviour
         ClampValues();
         UpdateUI();
 
+        StartCoroutine(SpawnImpactProjectile());
+        StartCoroutine(HPHitEffect());
+        StartCoroutine(ScreenImpact());
+
         yield return new WaitForSeconds(0.8f);
 
         CheckCombatEnd();
@@ -187,10 +198,132 @@ public class CombatManager : MonoBehaviour
         }
     }
 
+    IEnumerator SpawnImpactProjectile()
+    {
+        if (enemyHPBarRect == null || playerHPBarRect == null || canvas == null)
+            yield break;
+
+        GameObject impact = new GameObject("Impact");
+        impact.transform.SetParent(canvas.transform, false);
+
+        Image img = impact.AddComponent<Image>();
+        img.color = Color.red;
+
+        RectTransform rect = impact.GetComponent<RectTransform>();
+        rect.sizeDelta = new Vector2(50, 50);
+
+        Vector3 startPos = enemyHPBarRect.position;
+        Vector3 endPos = playerHPBarRect.position;
+
+        rect.position = startPos;
+
+        float duration = 0.25f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+
+            Vector3 arc = Vector3.up * Mathf.Sin(t * Mathf.PI) * 40f;
+            rect.position = Vector3.Lerp(startPos, endPos, t) + arc;
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        Destroy(impact);
+    }
+
+    IEnumerator HPHitEffect()
+    {
+        if (playerHPBar == null || playerHPBar.fillRect == null)
+            yield break;
+
+        Image fillImage = playerHPBar.fillRect.GetComponent<Image>();
+        if (fillImage == null)
+            yield break;
+
+        Color originalColor = fillImage.color;
+        Vector3 originalScale = playerHPBarRect.localScale;
+
+        fillImage.color = Color.red;
+        playerHPBarRect.localScale = originalScale * flashScaleAmount;
+
+        yield return new WaitForSeconds(flashDuration);
+
+        float elapsed = 0f;
+
+        while (elapsed < flashDuration)
+        {
+            fillImage.color = Color.Lerp(Color.red, originalColor, elapsed / flashDuration);
+            playerHPBarRect.localScale =
+                Vector3.Lerp(originalScale * flashScaleAmount, originalScale, elapsed / flashDuration);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        fillImage.color = originalColor;
+        playerHPBarRect.localScale = originalScale;
+    }
+
+    IEnumerator ScreenImpact()
+    {
+        if (screenFlashImage == null || mainCamera == null)
+            yield break;
+
+        Vector3 originalScale = mainCamera.transform.localScale;
+
+        float zoomAmount = 0.03f;     // çok küçük
+        float zoomTime = 0.08f;
+        float returnTime = 0.18f;
+
+        float flashTime = 0.06f;
+
+        // 1?? Flash
+        screenFlashImage.color = new Color(1, 1, 1, 0.35f);
+
+        // 2?? Çok hafif zoom in
+        float t = 0;
+        while (t < zoomTime)
+        {
+            mainCamera.transform.localScale =
+                Vector3.Lerp(originalScale, originalScale * (1 + zoomAmount), t / zoomTime);
+
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        // Flash fade
+        float flashElapsed = 0;
+        while (flashElapsed < flashTime)
+        {
+            float a = Mathf.Lerp(0.35f, 0f, flashElapsed / flashTime);
+            screenFlashImage.color = new Color(1, 1, 1, a);
+
+            flashElapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        // 3?? Smooth geri dönüþ
+        t = 0;
+        while (t < returnTime)
+        {
+            float ease = 1 - Mathf.Pow(1 - (t / returnTime), 3);
+            mainCamera.transform.localScale =
+                Vector3.Lerp(originalScale * (1 + zoomAmount), originalScale, ease);
+
+            t += Time.deltaTime;
+            yield return null;
+        }
+
+        screenFlashImage.color = new Color(1, 1, 1, 0);
+        mainCamera.transform.localScale = originalScale;
+    }
+
+
     void CheckCombatEnd()
     {
-        UpdateTurnUI();
-
         if (enemyHP <= 0)
         {
             currentState = CombatState.Win;

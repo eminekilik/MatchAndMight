@@ -1790,6 +1790,14 @@ MonoBehaviour:
   playerManaBar: {fileID: 1498190003}
   enemyHPBar: {fileID: 602390098}
   turnText: {fileID: 1378216491}
+  playerHPBarRect: {fileID: 508790995}
+  mainCamera: {fileID: 519420031}
+  flashDuration: 0.15
+  flashScaleAmount: 1.08
+  uiShakeDuration: 0.2
+  uiShakeAmount: 10
+  cameraShakeDuration: 0.25
+  cameraShakeAmount: 0.15
 --- !u!1 &2102584426
 GameObject:
   m_ObjectHideFlags: 0
