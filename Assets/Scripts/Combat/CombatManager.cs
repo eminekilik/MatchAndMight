@@ -53,8 +53,14 @@ public class CombatManager : MonoBehaviour
     public float flashScaleAmount = 1.05f;
 
     [Header("Screen Impact")]
-    public Image screenFlashImage; // full screen beyaz image
+    public Image screenFlashImage;
 
+    // Cached values
+    Vector3 enemyBarBaseScale;
+    Vector3 playerBarBaseScale;
+
+    Coroutine enemyHitRoutine;
+    Coroutine enemyShakeRoutine;
 
     void Awake()
     {
@@ -71,6 +77,9 @@ public class CombatManager : MonoBehaviour
         playerHP = playerMaxHP;
         enemyHP = enemyMaxHP;
         playerMana = 0;
+
+        enemyBarBaseScale = enemyHPBarRect.localScale;
+        playerBarBaseScale = playerHPBarRect.localScale;
 
         SetupSliders();
         UpdateUI();
@@ -101,14 +110,21 @@ public class CombatManager : MonoBehaviour
 
     void UpdateTurnUI()
     {
-        if (currentState == CombatState.PlayerTurn)
-            turnText.text = "PLAYER TURN";
-        else if (currentState == CombatState.EnemyTurn)
-            turnText.text = "ENEMY TURN";
-        else if (currentState == CombatState.Win)
-            turnText.text = "YOU WIN";
-        else if (currentState == CombatState.Lose)
-            turnText.text = "YOU LOSE";
+        switch (currentState)
+        {
+            case CombatState.PlayerTurn:
+                turnText.text = "PLAYER TURN";
+                break;
+            case CombatState.EnemyTurn:
+                turnText.text = "ENEMY TURN";
+                break;
+            case CombatState.Win:
+                turnText.text = "YOU WIN";
+                break;
+            case CombatState.Lose:
+                turnText.text = "YOU LOSE";
+                break;
+        }
     }
 
     public void OnMatch(GemType type, int count)
@@ -120,10 +136,16 @@ public class CombatManager : MonoBehaviour
         {
             case GemType.Red:
                 enemyHP -= count * redDamage;
+
+                StartCoroutine(SpawnPlayerImpactProjectile());
+                TriggerEnemyHitEffect();
+                TriggerEnemyShake();
                 break;
+
             case GemType.Blue:
                 playerMana += count * blueMana;
                 break;
+
             case GemType.Green:
                 playerHP += count * greenHeal;
                 break;
@@ -133,12 +155,124 @@ public class CombatManager : MonoBehaviour
         UpdateUI();
     }
 
+    #region Enemy Hit Effects
+
+    void TriggerEnemyHitEffect()
+    {
+        if (enemyHitRoutine != null)
+            StopCoroutine(enemyHitRoutine);
+
+        enemyHitRoutine = StartCoroutine(EnemyHPHitEffect());
+    }
+
+    IEnumerator EnemyHPHitEffect()
+    {
+        if (enemyHPBar.fillRect == null)
+            yield break;
+
+        Image fillImage = enemyHPBar.fillRect.GetComponent<Image>();
+        if (fillImage == null)
+            yield break;
+
+        Color originalColor = fillImage.color;
+
+        fillImage.color = Color.red;
+        enemyHPBarRect.localScale = enemyBarBaseScale * flashScaleAmount;
+
+        yield return new WaitForSeconds(flashDuration);
+
+        float elapsed = 0f;
+
+        while (elapsed < flashDuration)
+        {
+            float t = elapsed / flashDuration;
+
+            fillImage.color = Color.Lerp(Color.red, originalColor, t);
+            enemyHPBarRect.localScale =
+                Vector3.Lerp(enemyBarBaseScale * flashScaleAmount, enemyBarBaseScale, t);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        fillImage.color = originalColor;
+        enemyHPBarRect.localScale = enemyBarBaseScale;
+
+        enemyHitRoutine = null;
+    }
+
+    void TriggerEnemyShake()
+    {
+        if (enemyShakeRoutine != null)
+            StopCoroutine(enemyShakeRoutine);
+
+        enemyShakeRoutine = StartCoroutine(EnemyBarShake());
+    }
+
+    IEnumerator EnemyBarShake()
+    {
+        Vector3 originalPos = enemyHPBarRect.localPosition;
+
+        float duration = 0.15f;
+        float strength = 8f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            float offsetX = Random.Range(-1f, 1f) * strength;
+            float offsetY = Random.Range(-1f, 1f) * strength;
+
+            enemyHPBarRect.localPosition = originalPos + new Vector3(offsetX, offsetY, 0);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        enemyHPBarRect.localPosition = originalPos;
+        enemyShakeRoutine = null;
+    }
+
+    #endregion
+
+    IEnumerator SpawnPlayerImpactProjectile()
+    {
+        if (!enemyHPBarRect || !playerHPBarRect || !canvas)
+            yield break;
+
+        GameObject impact = new GameObject("PlayerImpact");
+        impact.transform.SetParent(canvas.transform, false);
+
+        Image img = impact.AddComponent<Image>();
+        img.color = Color.red;
+
+        RectTransform rect = impact.GetComponent<RectTransform>();
+        rect.sizeDelta = new Vector2(50, 50);
+
+        Vector3 startPos = playerHPBarRect.position;
+        Vector3 endPos = enemyHPBarRect.position;
+
+        float duration = 0.25f;
+        float elapsed = 0f;
+
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+            Vector3 arc = Vector3.up * Mathf.Sin(t * Mathf.PI) * 40f;
+
+            rect.position = Vector3.Lerp(startPos, endPos, t) + arc;
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        Destroy(impact);
+    }
+
     void ClampValues()
     {
-        if (enemyHP < 0) enemyHP = 0;
-        if (playerHP < 0) playerHP = 0;
-        if (playerHP > playerMaxHP) playerHP = playerMaxHP;
-        if (playerMana > playerMaxMana) playerMana = playerMaxMana;
+        enemyHP = Mathf.Clamp(enemyHP, 0, enemyMaxHP);
+        playerHP = Mathf.Clamp(playerHP, 0, playerMaxHP);
+        playerMana = Mathf.Clamp(playerMana, 0, playerMaxMana);
     }
 
     void UpdateUI()
@@ -200,9 +334,6 @@ public class CombatManager : MonoBehaviour
 
     IEnumerator SpawnImpactProjectile()
     {
-        if (enemyHPBarRect == null || playerHPBarRect == null || canvas == null)
-            yield break;
-
         GameObject impact = new GameObject("Impact");
         impact.transform.SetParent(canvas.transform, false);
 
@@ -215,16 +346,14 @@ public class CombatManager : MonoBehaviour
         Vector3 startPos = enemyHPBarRect.position;
         Vector3 endPos = playerHPBarRect.position;
 
-        rect.position = startPos;
-
         float duration = 0.25f;
         float elapsed = 0f;
 
         while (elapsed < duration)
         {
             float t = elapsed / duration;
-
             Vector3 arc = Vector3.up * Mathf.Sin(t * Mathf.PI) * 40f;
+
             rect.position = Vector3.Lerp(startPos, endPos, t) + arc;
 
             elapsed += Time.deltaTime;
@@ -236,18 +365,11 @@ public class CombatManager : MonoBehaviour
 
     IEnumerator HPHitEffect()
     {
-        if (playerHPBar == null || playerHPBar.fillRect == null)
-            yield break;
-
         Image fillImage = playerHPBar.fillRect.GetComponent<Image>();
-        if (fillImage == null)
-            yield break;
-
         Color originalColor = fillImage.color;
-        Vector3 originalScale = playerHPBarRect.localScale;
 
+        playerHPBarRect.localScale = playerBarBaseScale * flashScaleAmount;
         fillImage.color = Color.red;
-        playerHPBarRect.localScale = originalScale * flashScaleAmount;
 
         yield return new WaitForSeconds(flashDuration);
 
@@ -255,35 +377,31 @@ public class CombatManager : MonoBehaviour
 
         while (elapsed < flashDuration)
         {
-            fillImage.color = Color.Lerp(Color.red, originalColor, elapsed / flashDuration);
+            float t = elapsed / flashDuration;
+
+            fillImage.color = Color.Lerp(Color.red, originalColor, t);
             playerHPBarRect.localScale =
-                Vector3.Lerp(originalScale * flashScaleAmount, originalScale, elapsed / flashDuration);
+                Vector3.Lerp(playerBarBaseScale * flashScaleAmount, playerBarBaseScale, t);
 
             elapsed += Time.deltaTime;
             yield return null;
         }
 
         fillImage.color = originalColor;
-        playerHPBarRect.localScale = originalScale;
+        playerHPBarRect.localScale = playerBarBaseScale;
     }
 
     IEnumerator ScreenImpact()
     {
-        if (screenFlashImage == null || mainCamera == null)
-            yield break;
-
         Vector3 originalScale = mainCamera.transform.localScale;
 
-        float zoomAmount = 0.03f;     // çok küçük
+        float zoomAmount = 0.03f;
         float zoomTime = 0.08f;
         float returnTime = 0.18f;
-
         float flashTime = 0.06f;
 
-        // 1?? Flash
         screenFlashImage.color = new Color(1, 1, 1, 0.35f);
 
-        // 2?? Çok hafif zoom in
         float t = 0;
         while (t < zoomTime)
         {
@@ -294,7 +412,6 @@ public class CombatManager : MonoBehaviour
             yield return null;
         }
 
-        // Flash fade
         float flashElapsed = 0;
         while (flashElapsed < flashTime)
         {
@@ -305,7 +422,6 @@ public class CombatManager : MonoBehaviour
             yield return null;
         }
 
-        // 3?? Smooth geri dönüþ
         t = 0;
         while (t < returnTime)
         {
@@ -321,20 +437,17 @@ public class CombatManager : MonoBehaviour
         mainCamera.transform.localScale = originalScale;
     }
 
-
     void CheckCombatEnd()
     {
         if (enemyHP <= 0)
         {
             currentState = CombatState.Win;
             UpdateTurnUI();
-            Debug.Log("YOU WIN");
         }
         else if (playerHP <= 0)
         {
             currentState = CombatState.Lose;
             UpdateTurnUI();
-            Debug.Log("YOU LOSE");
         }
     }
 }
