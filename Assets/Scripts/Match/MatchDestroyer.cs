@@ -6,7 +6,7 @@ public class MatchDestroyer : MonoBehaviour
 {
     public static MatchDestroyer Instance;
 
-    public System.Action<Dictionary<GemType, int>> OnMatchesResolved;
+    public System.Action<Dictionary<GemType, int>, Vector3> OnMatchesResolved;
     public System.Action OnResolveFinished;
 
     void Awake()
@@ -48,7 +48,24 @@ public class MatchDestroyer : MonoBehaviour
             matchCounts[gem.gemType]++;
         }
 
-        OnMatchesResolved?.Invoke(matchCounts);
+        // Ortalama dünya pozisyonu hesapla
+        Vector3 center = Vector3.zero;
+        int validCount = 0;
+
+        foreach (Gem gem in matches)
+        {
+            if (gem == null) continue;
+
+            center += gem.transform.position;
+            validCount++;
+        }
+
+        if (validCount > 0)
+            center /= validCount;
+
+        // Event'i pozisyonla birlikte gönder
+        OnMatchesResolved?.Invoke(matchCounts, center);
+
 
         foreach (Gem gem in matches)
         {
