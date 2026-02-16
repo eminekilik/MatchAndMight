@@ -30,7 +30,7 @@ public class CombatManager : MonoBehaviour
     public int enemyHP;
 
     [Header("Gem Values")]
-    public int redDamage = 5;
+    public int redDamage = 2;
     public int blueMana = 3;
     public int greenHeal = 4;
 
@@ -148,7 +148,8 @@ public class CombatManager : MonoBehaviour
         switch (type)
         {
             case GemType.Red:
-                enemyHP -= count * redDamage;
+                int totalDamage = redDamage + (count - 3);
+                enemyHP -= totalDamage;
 
                 StartCoroutine(SpawnPlayerImpactProjectile(worldPos));
                 TriggerEnemyHitEffect();

@@ -268,7 +268,7 @@ Transform:
   m_GameObject: {fileID: 118700948}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: -2, z: 0}
+  m_LocalPosition: {x: 0, y: -2.15, z: 0}
   m_LocalScale: {x: 4, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -910,7 +910,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1088039117
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -923,9 +923,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d7eca8fc299780c409dbecaa0bd851d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  width: 4
-  height: 4
-  tileSize: 1
+  width: 5
+  height: 5
+  tileSize: 0.75
   tilePrefab: {fileID: 8004888151849008632, guid: f1c42e9ddb4b7e74aa1f169a3e51ada4, type: 3}
   gemPrefabs:
   - {fileID: 448025075340840488, guid: 52138d184d8ce8e47ae985205c0c6e6a, type: 3}

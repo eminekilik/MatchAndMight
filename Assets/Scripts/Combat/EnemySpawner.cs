@@ -1,0 +1,32 @@
+using UnityEngine;
+
+public class EnemySpawner : MonoBehaviour
+{
+    [Header("Enemy Prefabs")]
+    public GameObject[] enemyPrefabs;
+
+    [Header("Spawn Point")]
+    public Transform spawnPoint;
+
+    void Start()
+    {
+        SpawnEnemy();
+    }
+
+    void SpawnEnemy()
+    {
+        if (enemyPrefabs == null || enemyPrefabs.Length == 0)
+        {
+            Debug.LogWarning("Enemy Prefabs boþ!");
+            return;
+        }
+
+        int index = Random.Range(0, enemyPrefabs.Length);
+
+        Instantiate(
+            enemyPrefabs[index],
+            spawnPoint.position,
+            Quaternion.identity
+        );
+    }
+}
