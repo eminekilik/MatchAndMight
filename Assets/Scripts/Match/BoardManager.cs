@@ -39,7 +39,7 @@ public class BoardManager : MonoBehaviour
 
         float boardWidth = (width - 1) * tileSize;
         float xOffset = boardWidth / 2f;
-        float bottomPadding = 1f;
+        float bottomPadding = .5f;
 
         float cameraBottom = Camera.main.ViewportToWorldPoint(new Vector3(0, 0, 0)).y;
 

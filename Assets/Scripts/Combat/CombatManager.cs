@@ -26,7 +26,7 @@ public class CombatManager : MonoBehaviour
     public int playerMana;
 
     [Header("Enemy")]
-    public int enemyMaxHP = 100;
+    public int enemyMaxHP = 1000;
     public int enemyHP;
 
     [Header("Gem Values")]
@@ -42,12 +42,6 @@ public class CombatManager : MonoBehaviour
     [Header("Turn UI")]
     public TMP_Text turnText;
 
-    [Header("UI References")]
-    public RectTransform playerHPBarRect;
-    public RectTransform enemyHPBarRect;
-    public Canvas canvas;
-    public Camera mainCamera;
-
     [Header("Impact Settings")]
     public float flashDuration = 0.12f;
     public float flashScaleAmount = 1.05f;
@@ -55,22 +49,19 @@ public class CombatManager : MonoBehaviour
     [Header("Screen Impact")]
     public Image screenFlashImage;
 
-    // Cached values
-    Vector3 enemyBarBaseScale;
-    Vector3 playerBarBaseScale;
-
-    Coroutine enemyHitRoutine;
-    Coroutine enemyShakeRoutine;
-
     [Header("Board Lock Visual")]
     public GameObject boardDarkOverlay;
 
-    [Header("Particle Projectiles")]
-    public ParticleSystem playerProjectileParticle;
-    public ParticleSystem playerImpactParticle;
-    public ParticleSystem enemyProjectileParticle;
-    public ParticleSystem enemyImpactParticle;
+    [Header("Projectile Prefabs")]
+    public GameObject playerProjectilePrefab;
+    public GameObject enemyProjectilePrefab;
 
+    [Header("World Targets")]
+    public Transform enemyWorldTarget;
+    public Transform playerWorldTarget;
+
+    Vector3 enemyBarBaseScale;
+    Vector3 playerBarBaseScale;
 
     void Awake()
     {
@@ -88,14 +79,15 @@ public class CombatManager : MonoBehaviour
         enemyHP = enemyMaxHP;
         playerMana = 0;
 
-        enemyBarBaseScale = enemyHPBarRect.localScale;
-        playerBarBaseScale = playerHPBarRect.localScale;
+        enemyBarBaseScale = enemyHPBar.transform.localScale;
+        playerBarBaseScale = playerHPBar.transform.localScale;
 
         SetupSliders();
         UpdateUI();
         UpdateTurnUI();
 
-        boardDarkOverlay.SetActive(false);
+        if (boardDarkOverlay != null)
+            boardDarkOverlay.SetActive(false);
     }
 
     void HandleMatches(Dictionary<GemType, int> matchCounts, Vector3 worldPos)
@@ -106,7 +98,6 @@ public class CombatManager : MonoBehaviour
         foreach (var pair in matchCounts)
             OnMatch(pair.Key, pair.Value, worldPos);
     }
-
 
     void HandleResolveFinished()
     {
@@ -125,18 +116,10 @@ public class CombatManager : MonoBehaviour
     {
         switch (currentState)
         {
-            case CombatState.PlayerTurn:
-                turnText.text = "PLAYER TURN";
-                break;
-            case CombatState.EnemyTurn:
-                turnText.text = "ENEMY TURN";
-                break;
-            case CombatState.Win:
-                turnText.text = "YOU WIN";
-                break;
-            case CombatState.Lose:
-                turnText.text = "YOU LOSE";
-                break;
+            case CombatState.PlayerTurn: turnText.text = "PLAYER TURN"; break;
+            case CombatState.EnemyTurn: turnText.text = "ENEMY TURN"; break;
+            case CombatState.Win: turnText.text = "YOU WIN"; break;
+            case CombatState.Lose: turnText.text = "YOU LOSE"; break;
         }
     }
 
@@ -151,9 +134,7 @@ public class CombatManager : MonoBehaviour
                 int totalDamage = redDamage + (count - 3);
                 enemyHP -= totalDamage;
 
-                StartCoroutine(SpawnPlayerImpactProjectile(worldPos));
-                TriggerEnemyHitEffect();
-                TriggerEnemyShake();
+                FirePlayerProjectile(worldPos);
                 break;
 
             case GemType.Blue:
@@ -169,119 +150,29 @@ public class CombatManager : MonoBehaviour
         UpdateUI();
     }
 
-    #region Enemy Hit Effects
-
-    void TriggerEnemyHitEffect()
+    void FirePlayerProjectile(Vector3 startPos)
     {
-        if (enemyHitRoutine != null)
-            StopCoroutine(enemyHitRoutine);
+        if (playerProjectilePrefab == null || enemyWorldTarget == null)
+            return;
 
-        enemyHitRoutine = StartCoroutine(EnemyHPHitEffect());
+        GameObject proj = Instantiate(playerProjectilePrefab, startPos, Quaternion.identity);
+
+        EnergyProjectile ep = proj.GetComponent<EnergyProjectile>();
+        if (ep != null)
+            ep.SetTarget(enemyWorldTarget);
     }
 
-    IEnumerator EnemyHPHitEffect()
+    void FireEnemyProjectile()
     {
-        if (enemyHPBar.fillRect == null)
-            yield break;
+        if (enemyProjectilePrefab == null || playerWorldTarget == null || enemyWorldTarget == null)
+            return;
 
-        Image fillImage = enemyHPBar.fillRect.GetComponent<Image>();
-        if (fillImage == null)
-            yield break;
+        GameObject proj = Instantiate(enemyProjectilePrefab, enemyWorldTarget.position, Quaternion.identity);
 
-        Color originalColor = fillImage.color;
-
-        fillImage.color = Color.red;
-        enemyHPBarRect.localScale = enemyBarBaseScale * flashScaleAmount;
-
-        yield return new WaitForSeconds(flashDuration);
-
-        float elapsed = 0f;
-
-        while (elapsed < flashDuration)
-        {
-            float t = elapsed / flashDuration;
-
-            fillImage.color = Color.Lerp(Color.red, originalColor, t);
-            enemyHPBarRect.localScale =
-                Vector3.Lerp(enemyBarBaseScale * flashScaleAmount, enemyBarBaseScale, t);
-
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        fillImage.color = originalColor;
-        enemyHPBarRect.localScale = enemyBarBaseScale;
-
-        enemyHitRoutine = null;
+        EnergyProjectile ep = proj.GetComponent<EnergyProjectile>();
+        if (ep != null)
+            ep.SetTarget(playerWorldTarget);
     }
-
-    void TriggerEnemyShake()
-    {
-        if (enemyShakeRoutine != null)
-            StopCoroutine(enemyShakeRoutine);
-
-        enemyShakeRoutine = StartCoroutine(EnemyBarShake());
-    }
-
-    IEnumerator EnemyBarShake()
-    {
-        Vector3 originalPos = enemyHPBarRect.localPosition;
-
-        float duration = 0.15f;
-        float strength = 8f;
-        float elapsed = 0f;
-
-        while (elapsed < duration)
-        {
-            float offsetX = Random.Range(-1f, 1f) * strength;
-            float offsetY = Random.Range(-1f, 1f) * strength;
-
-            enemyHPBarRect.localPosition = originalPos + new Vector3(offsetX, offsetY, 0);
-
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        enemyHPBarRect.localPosition = originalPos;
-        enemyShakeRoutine = null;
-    }
-
-    #endregion
-
-    IEnumerator SpawnPlayerImpactProjectile(Vector3 worldStartPos)
-    {
-        if (playerProjectileParticle == null)
-            yield break;
-
-        // Hedef: enemy HP bar world pozisyonu
-        Vector3 targetScreen = enemyHPBarRect.position;
-        Vector3 targetWorld = mainCamera.ScreenToWorldPoint(
-            new Vector3(targetScreen.x, targetScreen.y, 10f)
-        );
-
-        Vector3 direction = (targetWorld - worldStartPos).normalized;
-        float distance = Vector3.Distance(worldStartPos, targetWorld);
-
-        // Projectile düþmana doðru bakarak spawn olur
-        ParticleSystem projectile =
-            Instantiate(playerProjectileParticle, worldStartPos, Quaternion.LookRotation(direction));
-
-        var main = projectile.main;
-
-        // 0.35 saniyede hedefe ulaþacak hýz
-        main.startSpeed = distance / 0.35f;
-        main.startLifetime = 0.35f;
-
-        yield return new WaitForSeconds(0.35f);
-
-        if (playerImpactParticle != null)
-            Instantiate(playerImpactParticle, targetWorld, Quaternion.identity);
-
-        Destroy(projectile.gameObject, 0.5f);
-    }
-
-
-
 
     void ClampValues()
     {
@@ -302,21 +193,6 @@ public class CombatManager : MonoBehaviour
         if (currentState != CombatState.PlayerTurn)
             return;
 
-        currentState = CombatState.Busy;
-        UpdateTurnUI();
-        UpdateBoardLockVisual();
-
-        CheckCombatEnd();
-        if (currentState == CombatState.Win || currentState == CombatState.Lose)
-            return;
-
-        StartCoroutine(StartEnemyTurnDelayed());
-    }
-
-    IEnumerator StartEnemyTurnDelayed()
-    {
-        yield return new WaitForSeconds(0.4f);
-
         currentState = CombatState.EnemyTurn;
         UpdateTurnUI();
         UpdateBoardLockVisual();
@@ -334,144 +210,13 @@ public class CombatManager : MonoBehaviour
         ClampValues();
         UpdateUI();
 
-        StartCoroutine(SpawnImpactProjectile());
-        StartCoroutine(HPHitEffect());
-        StartCoroutine(ScreenImpact());
+        FireEnemyProjectile();
 
         yield return new WaitForSeconds(0.8f);
 
-        CheckCombatEnd();
-
-        if (currentState != CombatState.Win && currentState != CombatState.Lose)
-        {
-            currentState = CombatState.PlayerTurn;
-            UpdateTurnUI();
-            UpdateBoardLockVisual();
-        }
-    }
-
-    IEnumerator SpawnImpactProjectile()
-    {
-        if (enemyProjectileParticle == null)
-            yield break;
-
-        Vector3 startScreen = enemyHPBarRect.position;
-        Vector3 startWorld = mainCamera.ScreenToWorldPoint(
-            new Vector3(startScreen.x, startScreen.y, 10f)
-        );
-
-        Vector3 targetScreen = playerHPBarRect.position;
-        Vector3 targetWorld = mainCamera.ScreenToWorldPoint(
-            new Vector3(targetScreen.x, targetScreen.y, 10f)
-        );
-
-        Vector3 direction = (targetWorld - startWorld).normalized;
-        float distance = Vector3.Distance(startWorld, targetWorld);
-
-        ParticleSystem projectile =
-            Instantiate(enemyProjectileParticle, startWorld, Quaternion.LookRotation(direction));
-
-        var main = projectile.main;
-        main.startSpeed = distance / 0.35f;   // 0.35 saniyede hedefe ulaþýr
-
-        yield return new WaitForSeconds(0.35f);
-
-        if (enemyImpactParticle != null)
-            Instantiate(enemyImpactParticle, targetWorld, Quaternion.identity);
-
-        Destroy(projectile.gameObject, 0.5f);
-    }
-
-
-
-    IEnumerator HPHitEffect()
-    {
-        Image fillImage = playerHPBar.fillRect.GetComponent<Image>();
-        Color originalColor = fillImage.color;
-
-        playerHPBarRect.localScale = playerBarBaseScale * flashScaleAmount;
-        fillImage.color = Color.red;
-
-        yield return new WaitForSeconds(flashDuration);
-
-        float elapsed = 0f;
-
-        while (elapsed < flashDuration)
-        {
-            float t = elapsed / flashDuration;
-
-            fillImage.color = Color.Lerp(Color.red, originalColor, t);
-            playerHPBarRect.localScale =
-                Vector3.Lerp(playerBarBaseScale * flashScaleAmount, playerBarBaseScale, t);
-
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        fillImage.color = originalColor;
-        playerHPBarRect.localScale = playerBarBaseScale;
-    }
-
-    IEnumerator ScreenImpact()
-    {
-        Vector3 originalScale = mainCamera.transform.localScale;
-
-        float zoomAmount = 0.03f;
-        float zoomTime = 0.08f;
-        float returnTime = 0.18f;
-        float flashTime = 0.06f;
-
-        screenFlashImage.color = new Color(1, 1, 1, 0.35f);
-
-        float t = 0;
-        while (t < zoomTime)
-        {
-            mainCamera.transform.localScale =
-                Vector3.Lerp(originalScale, originalScale * (1 + zoomAmount), t / zoomTime);
-
-            t += Time.deltaTime;
-            yield return null;
-        }
-
-        float flashElapsed = 0;
-        while (flashElapsed < flashTime)
-        {
-            float a = Mathf.Lerp(0.35f, 0f, flashElapsed / flashTime);
-            screenFlashImage.color = new Color(1, 1, 1, a);
-
-            flashElapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        t = 0;
-        while (t < returnTime)
-        {
-            float ease = 1 - Mathf.Pow(1 - (t / returnTime), 3);
-            mainCamera.transform.localScale =
-                Vector3.Lerp(originalScale * (1 + zoomAmount), originalScale, ease);
-
-            t += Time.deltaTime;
-            yield return null;
-        }
-
-        screenFlashImage.color = new Color(1, 1, 1, 0);
-        mainCamera.transform.localScale = originalScale;
-    }
-
-    void CheckCombatEnd()
-    {
-        if (enemyHP <= 0)
-        {
-            currentState = CombatState.Win;
-            UpdateTurnUI();
-            UpdateBoardLockVisual();
-        }
-        else if (playerHP <= 0)
-        {
-            currentState = CombatState.Lose;
-            UpdateTurnUI();
-            UpdateBoardLockVisual();
-        }
+        currentState = CombatState.PlayerTurn;
+        UpdateTurnUI();
+        UpdateBoardLockVisual();
     }
 
     void UpdateBoardLockVisual()
@@ -479,8 +224,6 @@ public class CombatManager : MonoBehaviour
         if (boardDarkOverlay == null)
             return;
 
-        bool lockBoard = currentState != CombatState.PlayerTurn;
-        boardDarkOverlay.SetActive(lockBoard);
+        boardDarkOverlay.SetActive(currentState != CombatState.PlayerTurn);
     }
-
 }
