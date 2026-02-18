@@ -23,10 +23,14 @@ public class EnemySpawner : MonoBehaviour
 
         int index = Random.Range(0, enemyPrefabs.Length);
 
-        Instantiate(
+        GameObject spawnedEnemy = Instantiate(
             enemyPrefabs[index],
             spawnPoint.position,
             Quaternion.identity
         );
+
+        // CombatManager'a bildir
+        CombatManager.Instance.SetEnemy(spawnedEnemy.transform);
     }
+
 }

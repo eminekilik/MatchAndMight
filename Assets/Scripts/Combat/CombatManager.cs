@@ -42,10 +42,6 @@ public class CombatManager : MonoBehaviour
     [Header("Turn UI")]
     public TMP_Text turnText;
 
-    [Header("Impact Settings")]
-    public float flashDuration = 0.12f;
-    public float flashScaleAmount = 1.05f;
-
     [Header("Screen Impact")]
     public Image screenFlashImage;
 
@@ -60,8 +56,22 @@ public class CombatManager : MonoBehaviour
     public Transform enemyWorldTarget;
     public Transform playerWorldTarget;
 
-    Vector3 enemyBarBaseScale;
-    Vector3 playerBarBaseScale;
+    [Header("Damage Text")]
+    public GameObject damageTextPrefab;
+    public Canvas worldCanvas;
+
+    Vector3 enemyOriginalScale;
+    Vector3 playerOriginalScale;
+    [Header("Enemy Visual")]
+    SpriteRenderer enemySprite;
+    Coroutine playerPunchRoutine;
+    Vector3 playerBaseScale;
+    Coroutine enemyHitRoutine;
+    Vector3 enemyBaseScale;
+    Vector3 enemyBasePosition;
+
+
+
 
     void Awake()
     {
@@ -79,15 +89,15 @@ public class CombatManager : MonoBehaviour
         enemyHP = enemyMaxHP;
         playerMana = 0;
 
-        enemyBarBaseScale = enemyHPBar.transform.localScale;
-        playerBarBaseScale = playerHPBar.transform.localScale;
+        enemyOriginalScale = enemyWorldTarget.localScale;
+        playerOriginalScale = playerWorldTarget.localScale;
 
         SetupSliders();
         UpdateUI();
         UpdateTurnUI();
 
-        if (boardDarkOverlay != null)
-            boardDarkOverlay.SetActive(false);
+        if (screenFlashImage != null)
+            screenFlashImage.color = new Color(1, 0, 0, 0);
     }
 
     void HandleMatches(Dictionary<GemType, int> matchCounts, Vector3 worldPos)
@@ -132,9 +142,7 @@ public class CombatManager : MonoBehaviour
         {
             case GemType.Red:
                 int totalDamage = redDamage + (count - 3);
-                enemyHP -= totalDamage;
-
-                FirePlayerProjectile(worldPos);
+                FirePlayerProjectile(worldPos, totalDamage);
                 break;
 
             case GemType.Blue:
@@ -150,28 +158,237 @@ public class CombatManager : MonoBehaviour
         UpdateUI();
     }
 
-    void FirePlayerProjectile(Vector3 startPos)
+    void FirePlayerProjectile(Vector3 startPos, int damage)
     {
         if (playerProjectilePrefab == null || enemyWorldTarget == null)
             return;
 
         GameObject proj = Instantiate(playerProjectilePrefab, startPos, Quaternion.identity);
-
         EnergyProjectile ep = proj.GetComponent<EnergyProjectile>();
+
         if (ep != null)
-            ep.SetTarget(enemyWorldTarget);
+        {
+            ep.SetTarget(enemyWorldTarget, () =>
+            {
+                enemyHP -= damage;
+                ClampValues();
+                UpdateUI();
+
+                TriggerEnemyHitJuice();
+                ShowDamageText(damage, enemyWorldTarget.position);
+            });
+        }
     }
 
     void FireEnemyProjectile()
     {
-        if (enemyProjectilePrefab == null || playerWorldTarget == null || enemyWorldTarget == null)
+        if (enemyProjectilePrefab == null || playerWorldTarget == null)
             return;
 
         GameObject proj = Instantiate(enemyProjectilePrefab, enemyWorldTarget.position, Quaternion.identity);
-
         EnergyProjectile ep = proj.GetComponent<EnergyProjectile>();
+
         if (ep != null)
-            ep.SetTarget(playerWorldTarget);
+        {
+            ep.SetTarget(playerWorldTarget, () =>
+            {
+                int damage = Random.Range(6, 14);
+                playerHP -= damage;
+
+                ClampValues();
+                UpdateUI();
+
+                TriggerPlayerHitJuice();
+                ShowDamageText(damage, playerWorldTarget.position);
+                ScreenFlash();
+            });
+        }
+    }
+
+    public void SetEnemy(Transform enemyTransform)
+    {
+        enemyWorldTarget = enemyTransform;
+
+        enemyOriginalScale = enemyWorldTarget.localScale;
+
+        enemySprite = enemyWorldTarget.GetComponentInChildren<SpriteRenderer>();
+        enemyBaseScale = enemyTransform.localScale;
+        enemyBasePosition = enemyTransform.position;
+
+
+    }
+
+
+    void TriggerEnemyHitJuice()
+    {
+        if (enemyWorldTarget == null) return;
+
+        if (enemyHitRoutine != null)
+            StopCoroutine(enemyHitRoutine);
+
+        enemyWorldTarget.localScale = enemyBaseScale;
+
+        enemyHitRoutine = StartCoroutine(EnemyHitEffect());
+    }
+
+    IEnumerator EnemyHitEffect()
+    {
+        float duration = 0.25f;
+        float elapsed = 0;
+
+        Color originalColor = enemySprite.color;
+
+        float shakeAmount = 0.15f;
+        Vector3 punchScale = enemyBaseScale * 1.15f;
+
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+
+            // SHAKE (HER ZAMAN BASE POSITION'DAN)
+            float offsetX = Random.Range(-shakeAmount, shakeAmount);
+            enemyWorldTarget.position =
+                enemyBasePosition + new Vector3(offsetX, 0, 0);
+
+            // SCALE (HER ZAMAN BASE SCALE'DEN)
+            float ease = 1 - Mathf.Pow(1 - t, 3);
+            enemyWorldTarget.localScale =
+                Vector3.Lerp(punchScale, enemyBaseScale, ease);
+
+            // FLASH
+            if (t < 0.1f)
+                enemySprite.color = Color.white;
+            else
+                enemySprite.color =
+                    Color.Lerp(Color.white, originalColor, (t - 0.1f) / 0.9f);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        enemyWorldTarget.position = enemyBasePosition;
+        enemyWorldTarget.localScale = enemyBaseScale;
+        enemySprite.color = originalColor;
+    }
+
+
+    void TriggerPlayerHitJuice()
+    {
+        if (playerWorldTarget == null) return;
+
+        if (playerPunchRoutine != null)
+            StopCoroutine(playerPunchRoutine);
+
+        playerPunchRoutine =
+            StartCoroutine(PunchScale(playerWorldTarget, Vector3.one, 1.15f));
+    }
+
+
+
+    IEnumerator PunchScale(Transform target, Vector3 baseScale, float multiplier)
+    {
+        float duration = 0.18f;
+        float elapsed = 0;
+
+        Vector3 punch = baseScale * multiplier;
+
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+            float ease = 1 - Mathf.Pow(1 - t, 3);
+
+            target.localScale = Vector3.Lerp(punch, baseScale, ease);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        target.localScale = baseScale;
+    }
+
+
+    void ShowDamageText(int damage, Vector3 spawnPos)
+    {
+        if (damageTextPrefab == null || worldCanvas == null)
+            return;
+
+        GameObject textObj =
+            Instantiate(damageTextPrefab, spawnPos, Quaternion.identity, worldCanvas.transform);
+
+        TMP_Text tmp = textObj.GetComponent<TMP_Text>();
+        tmp.text = "-" + damage.ToString();
+
+        StartCoroutine(BattleCampDamageAnim(textObj));
+    }
+
+    IEnumerator BattleCampDamageAnim(GameObject obj)
+    {
+        float duration = 1.0f;
+        float elapsed = 0;
+
+        Vector3 startPos = obj.transform.position;
+
+        float randomX = Random.Range(-1.5f, 1.5f);
+        float height = Random.Range(3f, 4f);
+
+        CanvasGroup cg = obj.AddComponent<CanvasGroup>();
+
+        obj.transform.localScale = Vector3.one * 0.3f;
+        obj.transform.rotation = Quaternion.Euler(0, 0, Random.Range(-25f, 25f));
+
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+
+            float x = Mathf.Lerp(0, randomX, t);
+            float y = (height * t) - (4f * t * t);
+
+            obj.transform.position = startPos + new Vector3(x, y, 0);
+
+            if (t < 0.15f)
+            {
+                float pop = Mathf.Lerp(0.3f, 1.8f, t / 0.15f);
+                obj.transform.localScale = Vector3.one * pop;
+            }
+            else
+            {
+                float shrink = Mathf.Lerp(1.8f, 0.8f, (t - 0.15f) / 0.85f);
+                obj.transform.localScale = Vector3.one * shrink;
+            }
+
+            if (t > 0.6f)
+                cg.alpha = 1 - ((t - 0.6f) / 0.4f);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        Destroy(obj);
+    }
+
+    void ScreenFlash()
+    {
+        if (screenFlashImage == null)
+            return;
+
+        StartCoroutine(ScreenFlashRoutine());
+    }
+
+    IEnumerator ScreenFlashRoutine()
+    {
+        float duration = 0.2f;
+        float elapsed = 0;
+
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+            screenFlashImage.color = new Color(1, 1, 1, 0.6f * (1 - t));
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        screenFlashImage.color = new Color(1, 1, 1, 0);
     }
 
     void ClampValues()
@@ -202,17 +419,11 @@ public class CombatManager : MonoBehaviour
 
     IEnumerator EnemyTurnRoutine()
     {
-        yield return new WaitForSeconds(0.6f);
-
-        int damage = Random.Range(6, 14);
-        playerHP -= damage;
-
-        ClampValues();
-        UpdateUI();
+        yield return new WaitForSeconds(1f);
 
         FireEnemyProjectile();
 
-        yield return new WaitForSeconds(0.8f);
+        yield return new WaitForSeconds(1f);
 
         currentState = CombatState.PlayerTurn;
         UpdateTurnUI();

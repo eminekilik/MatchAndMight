@@ -1781,7 +1781,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-  m_PresetInfoIsWorld: 0
+  m_PresetInfoIsWorld: 1
 --- !u!223 &1889954654
 Canvas:
   m_ObjectHideFlags: 0
@@ -1791,9 +1791,9 @@ Canvas:
   m_GameObject: {fileID: 1889954651}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
-  m_PlaneDistance: 100
+  m_RenderMode: 2
+  m_Camera: {fileID: 519420031}
+  m_PlaneDistance: 1
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -1813,8 +1813,8 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1889954651}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: -9}
+  m_LocalScale: {x: 0.003949447, y: 0.003949447, z: 0.003949447}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 508790995}
@@ -1827,8 +1827,8 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 0, y: 0}
-  m_Pivot: {x: 0, y: 0}
+  m_SizeDelta: {x: 1170, y: 2532}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &1925012458
 GameObject:
   m_ObjectHideFlags: 0
@@ -1879,8 +1879,8 @@ MonoBehaviour:
   playerHP: 100
   playerMaxMana: 100
   playerMana: 0
-  enemyMaxHP: 100
-  enemyHP: 100
+  enemyMaxHP: 1000
+  enemyHP: 1000
   redDamage: 5
   blueMana: 3
   greenHeal: 4
@@ -1888,14 +1888,14 @@ MonoBehaviour:
   playerManaBar: {fileID: 1498190003}
   enemyHPBar: {fileID: 602390098}
   turnText: {fileID: 1378216491}
-  flashDuration: 0.12
-  flashScaleAmount: 1.05
   screenFlashImage: {fileID: 1581419598}
   boardDarkOverlay: {fileID: 118700948}
   playerProjectilePrefab: {fileID: 4124132742535735065, guid: f7dcb977090f0834b9b5424b0a91ada1, type: 3}
   enemyProjectilePrefab: {fileID: 4124132742535735065, guid: f7dcb977090f0834b9b5424b0a91ada1, type: 3}
   enemyWorldTarget: {fileID: 1604599326}
   playerWorldTarget: {fileID: 1088039118}
+  damageTextPrefab: {fileID: 583236581583283439, guid: 75c5a637865368c47a029b0fb0a70bec, type: 3}
+  worldCanvas: {fileID: 1889954654}
 --- !u!114 &1925012461
 MonoBehaviour:
   m_ObjectHideFlags: 0
