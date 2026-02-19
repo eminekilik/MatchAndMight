@@ -30,7 +30,9 @@ public class EnemySpawner : MonoBehaviour
         );
 
         // CombatManager'a bildir
-        CombatManager.Instance.SetEnemy(spawnedEnemy.transform);
+        //CombatManager.Instance.SetEnemy(spawnedEnemy.transform);
+        CombatManager.Instance.effects.SetEnemy(spawnedEnemy.transform);
+
     }
 
 }

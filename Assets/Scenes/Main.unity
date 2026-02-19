@@ -1839,6 +1839,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1925012459}
   - component: {fileID: 1925012460}
+  - component: {fileID: 1925012464}
+  - component: {fileID: 1925012463}
+  - component: {fileID: 1925012462}
   - component: {fileID: 1925012461}
   m_Layer: 0
   m_Name: Combat
@@ -1884,18 +1887,9 @@ MonoBehaviour:
   redDamage: 5
   blueMana: 3
   greenHeal: 4
-  playerHPBar: {fileID: 508790996}
-  playerManaBar: {fileID: 1498190003}
-  enemyHPBar: {fileID: 602390098}
-  turnText: {fileID: 1378216491}
-  screenFlashImage: {fileID: 1581419598}
-  boardDarkOverlay: {fileID: 118700948}
-  playerProjectilePrefab: {fileID: 4124132742535735065, guid: f7dcb977090f0834b9b5424b0a91ada1, type: 3}
-  enemyProjectilePrefab: {fileID: 4124132742535735065, guid: f7dcb977090f0834b9b5424b0a91ada1, type: 3}
-  enemyWorldTarget: {fileID: 1604599326}
-  playerWorldTarget: {fileID: 1088039118}
-  damageTextPrefab: {fileID: 583236581583283439, guid: 75c5a637865368c47a029b0fb0a70bec, type: 3}
-  worldCanvas: {fileID: 1889954654}
+  ui: {fileID: 1925012462}
+  projectiles: {fileID: 1925012463}
+  effects: {fileID: 1925012464}
 --- !u!114 &1925012461
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1914,6 +1908,54 @@ MonoBehaviour:
   - {fileID: 156365959517761698, guid: f5675b02d6558da4ba6a59a14b8fcaf6, type: 3}
   - {fileID: 2430156019071685172, guid: de69c702ae7d7794c8d8c2e37778a48d, type: 3}
   spawnPoint: {fileID: 1604599326}
+--- !u!114 &1925012462
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1925012458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ef0f7b27f7b19db4c84131c64a7afc6b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerHPBar: {fileID: 508790996}
+  playerManaBar: {fileID: 1498190003}
+  enemyHPBar: {fileID: 602390098}
+  turnText: {fileID: 1378216491}
+  boardDarkOverlay: {fileID: 118700948}
+--- !u!114 &1925012463
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1925012458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8021b3be2c396ee43833592125bf257c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerProjectilePrefab: {fileID: 4124132742535735065, guid: f7dcb977090f0834b9b5424b0a91ada1, type: 3}
+  enemyProjectilePrefab: {fileID: 4124132742535735065, guid: 2c151ca89244188449e01b08aaa30321, type: 3}
+--- !u!114 &1925012464
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1925012458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: de3da37124cf2404db9ff87d9aa21d7c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyWorldTarget: {fileID: 1604599326}
+  playerWorldTarget: {fileID: 508790995}
+  damageTextPrefab: {fileID: 583236581583283439, guid: 75c5a637865368c47a029b0fb0a70bec, type: 3}
+  worldCanvas: {fileID: 1889954654}
+  screenFlashImage: {fileID: 1581419598}
 --- !u!1 &2026361160
 GameObject:
   m_ObjectHideFlags: 0
