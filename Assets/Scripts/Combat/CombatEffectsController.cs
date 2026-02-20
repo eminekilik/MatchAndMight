@@ -11,6 +11,9 @@ public class CombatEffectsController : MonoBehaviour
     public Canvas worldCanvas;
     public Image screenFlashImage;
 
+    [Header("Power")]
+    public GameObject powerReadyText;
+
     SpriteRenderer enemySprite;
     Coroutine playerPunchRoutine;
     Coroutine enemyHitRoutine;
@@ -23,6 +26,18 @@ public class CombatEffectsController : MonoBehaviour
         enemySprite = enemyWorldTarget.GetComponentInChildren<SpriteRenderer>();
         enemyBaseScale = enemyTransform.localScale;
         enemyBasePosition = enemyTransform.position;
+    }
+
+    public void ShowPowerReady()
+    {
+        if (powerReadyText != null)
+            powerReadyText.SetActive(true);
+    }
+
+    public void HidePowerReady()
+    {
+        if (powerReadyText != null)
+            powerReadyText.SetActive(false);
     }
 
     public void TriggerEnemyHitJuice()
@@ -119,6 +134,63 @@ public class CombatEffectsController : MonoBehaviour
         StartCoroutine(DamageAnim(textObj));
     }
 
+    public void ShowDamageText(int damage, Vector3 spawnPos, Color color)
+    {
+        if (damageTextPrefab == null || worldCanvas == null)
+            return;
+
+        GameObject textObj =
+            Instantiate(damageTextPrefab, spawnPos, Quaternion.identity, worldCanvas.transform);
+
+        TMP_Text tmp = textObj.GetComponent<TMP_Text>();
+        tmp.text = "-" + damage.ToString();
+        tmp.color = color;
+
+        StartCoroutine(DamageAnim(textObj));
+    }
+
+    public void UIPunch(Transform target)
+    {
+        StartCoroutine(UIPunchRoutine(target));
+    }
+
+    IEnumerator UIPunchRoutine(Transform target)
+    {
+        float duration = 0.2f;
+        float elapsed = 0;
+
+        Vector3 baseScale = Vector3.one;
+        Vector3 punch = baseScale * 1.2f;
+
+        while (elapsed < duration)
+        {
+            float t = elapsed / duration;
+            float ease = 1 - Mathf.Pow(1 - t, 3);
+
+            target.localScale = Vector3.Lerp(punch, baseScale, ease);
+
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        target.localScale = baseScale;
+    }
+
+    public void ShowGainText(int amount, Vector3 spawnPos, Color color)
+    {
+        if (damageTextPrefab == null || worldCanvas == null)
+            return;
+
+        GameObject textObj =
+            Instantiate(damageTextPrefab, spawnPos, Quaternion.identity, worldCanvas.transform);
+
+        TMP_Text tmp = textObj.GetComponent<TMP_Text>();
+        tmp.text = "+" + amount.ToString();
+        tmp.color = color;
+
+        StartCoroutine(DamageAnim(textObj));
+    }
+
     IEnumerator DamageAnim(GameObject obj)
     {
         float duration = 1.0f;
@@ -187,5 +259,14 @@ public class CombatEffectsController : MonoBehaviour
         }
 
         screenFlashImage.color = new Color(1, 1, 1, 0);
+    }
+
+    public void ClearEnemy()
+    {
+        if (enemyHitRoutine != null)
+            StopCoroutine(enemyHitRoutine);
+
+        enemyWorldTarget = null;
+        enemySprite = null;
     }
 }

@@ -8,6 +8,8 @@ public class EnemySpawner : MonoBehaviour
     [Header("Spawn Point")]
     public Transform spawnPoint;
 
+    private GameObject currentEnemy;
+
     void Start()
     {
         SpawnEnemy();
@@ -23,16 +25,21 @@ public class EnemySpawner : MonoBehaviour
 
         int index = Random.Range(0, enemyPrefabs.Length);
 
-        GameObject spawnedEnemy = Instantiate(
+        currentEnemy = Instantiate(
             enemyPrefabs[index],
             spawnPoint.position,
             Quaternion.identity
         );
 
-        // CombatManager'a bildir
-        //CombatManager.Instance.SetEnemy(spawnedEnemy.transform);
-        CombatManager.Instance.effects.SetEnemy(spawnedEnemy.transform);
-
+        CombatManager.Instance.effects.SetEnemy(currentEnemy.transform);
     }
 
+    public void DestroyCurrentEnemy()
+    {
+        if (currentEnemy != null)
+        {
+            CombatManager.Instance.effects.ClearEnemy();
+            Destroy(currentEnemy);
+        }
+    }
 }

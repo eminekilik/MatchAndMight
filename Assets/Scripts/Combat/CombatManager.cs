@@ -22,6 +22,7 @@ public class CombatManager : MonoBehaviour
     public int playerHP;
     public int playerMaxMana = 100;
     public int playerMana;
+    private bool manaFullReady = false;
 
     [Header("Enemy")]
     public int enemyMaxHP = 1000;
@@ -82,15 +83,36 @@ public class CombatManager : MonoBehaviour
         {
             case GemType.Red:
                 int totalDamage = redDamage + (count - 3);
+
+                bool usedManaPower = false;
+
+                if (manaFullReady)
+                {
+                    totalDamage *= 2;
+                    playerMana = 0;
+                    manaFullReady = false;
+                    usedManaPower = true;
+
+                    effects.HidePowerReady();
+                }
+
                 projectiles.FirePlayerProjectile(worldPos, totalDamage, effects.enemyWorldTarget);
+
+                if (usedManaPower)
+                    effects.ShowDamageText(totalDamage, effects.enemyWorldTarget.position, Color.cyan);
+                else
+                    effects.ShowDamageText(totalDamage, effects.enemyWorldTarget.position);
+
                 break;
 
             case GemType.Blue:
-                playerMana += count * blueMana;
+                int manaGain = count * blueMana;
+                projectiles.FireManaProjectile(worldPos, manaGain);
                 break;
 
             case GemType.Green:
-                playerHP += count * greenHeal;
+                int healAmount = count * greenHeal;
+                projectiles.FireHealProjectile(worldPos, healAmount);
                 break;
         }
 
@@ -103,6 +125,12 @@ public class CombatManager : MonoBehaviour
         enemyHP = Mathf.Clamp(enemyHP, 0, enemyMaxHP);
         playerHP = Mathf.Clamp(playerHP, 0, playerMaxHP);
         playerMana = Mathf.Clamp(playerMana, 0, playerMaxMana);
+
+        if (playerMana >= playerMaxMana && !manaFullReady)
+        {
+            manaFullReady = true;
+            effects.ShowPowerReady();
+        }
     }
 
     public void UpdateUI()
@@ -126,12 +154,41 @@ public class CombatManager : MonoBehaviour
     {
         yield return new WaitForSeconds(1f);
 
+        if (currentState == CombatState.Win || currentState == CombatState.Lose)
+            yield break;
+
         projectiles.FireEnemyProjectile(effects.enemyWorldTarget, effects.playerWorldTarget);
 
         yield return new WaitForSeconds(1f);
+
+        if (currentState == CombatState.Win || currentState == CombatState.Lose)
+            yield break;
 
         currentState = CombatState.PlayerTurn;
         ui.UpdateTurnUI(currentState);
         ui.UpdateBoardLockVisual(currentState);
     }
+
+    public void CheckWinLose()
+    {
+        if (enemyHP <= 0 && currentState != CombatState.Win)
+        {
+            currentState = CombatState.Win;
+            ui.UpdateTurnUI(currentState);
+            ui.UpdateBoardLockVisual(currentState);
+
+            FindObjectOfType<EnemySpawner>().DestroyCurrentEnemy();
+
+            return;
+        }
+
+        if (playerHP <= 0 && currentState != CombatState.Lose)
+        {
+            currentState = CombatState.Lose;
+            ui.UpdateTurnUI(currentState);
+            ui.UpdateBoardLockVisual(currentState);
+            return;
+        }
+    }
+
 }
