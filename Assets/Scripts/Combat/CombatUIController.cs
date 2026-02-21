@@ -42,4 +42,10 @@ public class CombatUIController : MonoBehaviour
 
         boardDarkOverlay.SetActive(state != CombatManager.CombatState.PlayerTurn);
     }
+
+    public void SetEnemyBarActive(bool isActive)
+    {
+        if (enemyHPBar != null)
+            enemyHPBar.gameObject.SetActive(isActive);
+    }
 }

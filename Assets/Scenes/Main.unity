@@ -2017,8 +2017,8 @@ MonoBehaviour:
   playerHP: 100
   playerMaxMana: 100
   playerMana: 0
-  enemyMaxHP: 1000
-  enemyHP: 1000
+  enemyMaxHP: 100
+  enemyHP: 100
   redDamage: 5
   blueMana: 3
   greenHeal: 4

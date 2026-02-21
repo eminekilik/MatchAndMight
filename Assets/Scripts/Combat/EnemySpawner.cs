@@ -31,6 +31,8 @@ public class EnemySpawner : MonoBehaviour
             Quaternion.identity
         );
 
+        CombatManager.Instance.ui.SetEnemyBarActive(true);
+
         CombatManager.Instance.effects.SetEnemy(currentEnemy.transform);
     }
 
@@ -39,6 +41,7 @@ public class EnemySpawner : MonoBehaviour
         if (currentEnemy != null)
         {
             CombatManager.Instance.effects.ClearEnemy();
+            CombatManager.Instance.ui.SetEnemyBarActive(false);
             Destroy(currentEnemy);
         }
     }
