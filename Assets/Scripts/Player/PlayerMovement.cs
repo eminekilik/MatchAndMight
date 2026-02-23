@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class PlayerMovement : MonoBehaviour
 {
@@ -13,6 +14,9 @@ public class PlayerMovement : MonoBehaviour
     private Camera mainCamera;
 
     private Transform currentEnemyTarget;
+
+    private bool movingToEnemy = false;
+    public float battleDistance = 0.5f;
 
     void Start()
     {
@@ -36,16 +40,17 @@ public class PlayerMovement : MonoBehaviour
 
             if (hit.collider != null)
             {
-                //if (hit.collider.CompareTag("Enemy"))
-                //{
-                //    currentEnemyTarget = hit.collider.transform;
-                //    targetPosition = currentEnemyTarget.position;
-                //    isMoving = true;
-                //}
-                //else
-                if (hit.collider.CompareTag("Ground"))
+                if (hit.collider.CompareTag("Enemy"))
+                {
+                    currentEnemyTarget = hit.collider.transform;
+                    targetPosition = currentEnemyTarget.position;
+                    isMoving = true;
+                    movingToEnemy = true;
+                }
+                else if (hit.collider.CompareTag("Ground"))
                 {
                     currentEnemyTarget = null;
+                    movingToEnemy = false;
                     targetPosition = worldPoint;
                     isMoving = true;
                 }
@@ -76,27 +81,32 @@ public class PlayerMovement : MonoBehaviour
 
         float distance = Vector3.Distance(transform.position, targetPosition);
 
-        if (distance <= stopDistance)
+        if (distance > stopDistance)
         {
-            isMoving = false;
-            animator.SetBool("isWalking", false);
-
-            if (currentEnemyTarget != null)
-            {
-                StartBattle();
-            }
+            animator.SetBool("isWalking", true);
         }
         else
         {
-            animator.SetBool("isWalking", true);
+            animator.SetBool("isWalking", false);
+        }
+
+        if (movingToEnemy && currentEnemyTarget != null)
+        {
+            float enemyDistance = Vector3.Distance(transform.position, currentEnemyTarget.position);
+
+            if (enemyDistance <= battleDistance)
+            {
+                isMoving = false;
+                animator.SetBool("isWalking", false);
+                movingToEnemy = false;
+
+                StartBattle();
+            }
         }
     }
 
     void StartBattle()
     {
-        Debug.Log("Battle Basladi");
-
-        // Buraya Battle Scene load ekleyeceðiz
-        // SceneManager.LoadScene("BattleScene");
+        SceneManager.LoadScene("Battle");
     }
 }
