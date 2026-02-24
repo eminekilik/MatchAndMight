@@ -7,8 +7,9 @@ public class WorldEnemySpawner : MonoBehaviour
     public GameObject[] enemyPrefabs;
     public int enemyCount = 5;
 
-    [Header("Spawn Area")]
-    public BoxCollider2D spawnArea;
+    [Header("Spawn Area Settings")]
+    public float spawnWidth = 10f;
+    public float spawnHeight = 6f;
 
     [Header("Spawn Rules")]
     public float minDistanceBetweenEnemies = 1.5f;
@@ -22,17 +23,37 @@ public class WorldEnemySpawner : MonoBehaviour
 
     void SpawnEnemies()
     {
-        if (enemyPrefabs.Length == 0 || spawnArea == null)
+        if (enemyPrefabs.Length == 0)
         {
-            Debug.LogWarning("Eksik ayar var!");
+            Debug.LogWarning("Enemy prefab yok!");
             return;
         }
 
-        for (int i = 0; i < enemyCount; i++)
+        List<GameObject> spawnPool = new List<GameObject>();
+
+        while (spawnPool.Count < enemyCount)
+        {
+            List<GameObject> tempList = new List<GameObject>(enemyPrefabs);
+
+            for (int i = 0; i < tempList.Count; i++)
+            {
+                GameObject temp = tempList[i];
+                int randomIndex = Random.Range(i, tempList.Count);
+                tempList[i] = tempList[randomIndex];
+                tempList[randomIndex] = temp;
+            }
+
+            foreach (var enemy in tempList)
+            {
+                if (spawnPool.Count < enemyCount)
+                    spawnPool.Add(enemy);
+            }
+        }
+
+        foreach (var enemy in spawnPool)
         {
             Vector3 randomPos = GetRandomPosition();
-            GameObject randomEnemy = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
-            Instantiate(randomEnemy, randomPos, Quaternion.identity);
+            Instantiate(enemy, randomPos, Quaternion.identity);
         }
     }
 
@@ -41,14 +62,12 @@ public class WorldEnemySpawner : MonoBehaviour
         Vector3 randomPos;
         int safety = 0;
 
-        Bounds bounds = spawnArea.bounds;
-
         do
         {
-            float randomX = Random.Range(bounds.min.x, bounds.max.x);
-            float randomY = Random.Range(bounds.min.y, bounds.max.y);
+            float randomX = Random.Range(-spawnWidth / 2f, spawnWidth / 2f);
+            float randomY = Random.Range(-spawnHeight / 2f, spawnHeight / 2f);
 
-            randomPos = new Vector3(randomX, randomY, 0);
+            randomPos = transform.position + new Vector3(randomX, randomY, 0);
 
             safety++;
             if (safety > 100) break;
@@ -68,5 +87,11 @@ public class WorldEnemySpawner : MonoBehaviour
         }
 
         return true;
+    }
+
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireCube(transform.position, new Vector3(spawnWidth, spawnHeight, 0));
     }
 }

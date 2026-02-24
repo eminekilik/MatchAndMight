@@ -17,17 +17,23 @@ public class PlayerMovement : MonoBehaviour
 
     private bool movingToEnemy = false;
     public float battleDistance = 0.5f;
+    private Rigidbody2D rb;
 
     void Start()
     {
         mainCamera = Camera.main;
         animator = GetComponent<Animator>();
         targetPosition = transform.position;
+        rb = GetComponent<Rigidbody2D>();
     }
 
     void Update()
     {
-        HandleInput();
+        HandleInput();    
+    }
+
+    void FixedUpdate()
+    {
         HandleMovement();
     }
 
@@ -36,25 +42,9 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetMouseButtonDown(0))
         {
             Vector2 worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-            RaycastHit2D hit = Physics2D.Raycast(worldPoint, Vector2.zero);
 
-            if (hit.collider != null)
-            {
-                if (hit.collider.CompareTag("Enemy"))
-                {
-                    currentEnemyTarget = hit.collider.transform;
-                    targetPosition = currentEnemyTarget.position;
-                    isMoving = true;
-                    movingToEnemy = true;
-                }
-                else if (hit.collider.CompareTag("Ground"))
-                {
-                    currentEnemyTarget = null;
-                    movingToEnemy = false;
-                    targetPosition = worldPoint;
-                    isMoving = true;
-                }
-            }
+            targetPosition = worldPoint;
+            isMoving = true;
         }
     }
 
@@ -62,11 +52,14 @@ public class PlayerMovement : MonoBehaviour
     {
         if (!isMoving) return;
 
-        transform.position = Vector3.MoveTowards(
-            transform.position,
+        Vector2 newPosition = Vector2.MoveTowards
+        (
+            rb.position,
             targetPosition,
-            moveSpeed * Time.deltaTime
+            moveSpeed * Time.fixedDeltaTime
         );
+
+        rb.MovePosition(newPosition);
 
         Vector3 direction = targetPosition - transform.position;
 

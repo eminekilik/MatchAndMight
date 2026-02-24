@@ -2038,10 +2038,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyPrefabs:
-  - {fileID: 8215257398157374005, guid: f8565b8ece059704283d6c4241d23688, type: 3}
-  - {fileID: 2325032447830209419, guid: 14326d35dab2a5746818e222ac5464cb, type: 3}
-  - {fileID: 156365959517761698, guid: f5675b02d6558da4ba6a59a14b8fcaf6, type: 3}
-  - {fileID: 2430156019071685172, guid: de69c702ae7d7794c8d8c2e37778a48d, type: 3}
+  - {fileID: 8396144676467672943, guid: 5ef7b8a19a7581a4d8ad135e16067e52, type: 3}
+  - {fileID: 8396144676467672943, guid: f0fd75e72e8fcb145bf08ce720e3f630, type: 3}
+  - {fileID: 8396144676467672943, guid: 524ec7d42790caa4d8dcb2fd8939a68e, type: 3}
+  - {fileID: 8396144676467672943, guid: fcd77899ae68f8b47976c7810244c984, type: 3}
+  - {fileID: 8396144676467672943, guid: 86b6f6c3f076a94449ecc42ebadaf690, type: 3}
   spawnPoint: {fileID: 1604599326}
 --- !u!114 &1925012462
 MonoBehaviour:
