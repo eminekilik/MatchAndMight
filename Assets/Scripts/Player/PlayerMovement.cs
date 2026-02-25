@@ -14,27 +14,32 @@ public class PlayerMovement : MonoBehaviour
     private Camera mainCamera;
 
     private Transform currentEnemyTarget;
-
     private bool movingToEnemy = false;
     public float battleDistance = 0.5f;
+
     private Rigidbody2D rb;
+
+    private Vector2 lastPosition;
 
     void Start()
     {
         mainCamera = Camera.main;
         animator = GetComponent<Animator>();
-        targetPosition = transform.position;
         rb = GetComponent<Rigidbody2D>();
+
+        targetPosition = transform.position;
+        lastPosition = rb.position;
     }
 
     void Update()
     {
-        HandleInput();    
+        HandleInput();
     }
 
     void FixedUpdate()
     {
         HandleMovement();
+        UpdateAnimation();
     }
 
     void HandleInput()
@@ -64,38 +69,40 @@ public class PlayerMovement : MonoBehaviour
         Vector3 direction = targetPosition - transform.position;
 
         if (direction.x > 0.01f)
-        {
             transform.localScale = new Vector3(1, 1, 1);
-        }
         else if (direction.x < -0.01f)
-        {
             transform.localScale = new Vector3(-1, 1, 1);
-        }
 
-        float distance = Vector3.Distance(transform.position, targetPosition);
+        float distance = Vector3.Distance(rb.position, targetPosition);
 
-        if (distance > stopDistance)
+        if (distance <= stopDistance)
         {
-            animator.SetBool("isWalking", true);
-        }
-        else
-        {
-            animator.SetBool("isWalking", false);
+            isMoving = false;
         }
 
         if (movingToEnemy && currentEnemyTarget != null)
         {
-            float enemyDistance = Vector3.Distance(transform.position, currentEnemyTarget.position);
+            float enemyDistance = Vector3.Distance(rb.position, currentEnemyTarget.position);
 
             if (enemyDistance <= battleDistance)
             {
                 isMoving = false;
-                animator.SetBool("isWalking", false);
                 movingToEnemy = false;
 
                 StartBattle();
             }
         }
+    }
+
+    void UpdateAnimation()
+    {
+        float movedDistance = Vector2.Distance(rb.position, lastPosition);
+
+        bool actuallyMoving = movedDistance > 0.001f;
+
+        animator.SetBool("isWalking", actuallyMoving);
+
+        lastPosition = rb.position;
     }
 
     void StartBattle()
