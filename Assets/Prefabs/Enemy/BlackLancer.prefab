@@ -331,6 +331,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   fightObject: {fileID: 593855444956743450}
   activationDistance: 1.5
+  enemyData: {fileID: 11400000, guid: 860b81c72fc89114a85c674dceaa8621, type: 2}
 --- !u!61 &1479436300587546952
 BoxCollider2D:
   m_ObjectHideFlags: 0

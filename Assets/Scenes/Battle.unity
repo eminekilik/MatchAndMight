@@ -1978,6 +1978,7 @@ GameObject:
   - component: {fileID: 1925012463}
   - component: {fileID: 1925012462}
   - component: {fileID: 1925012461}
+  - component: {fileID: 1925012465}
   m_Layer: 0
   m_Name: Combat
   m_TagString: Untagged
@@ -2037,12 +2038,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbea33c3f60447644b2e08ab33599ca7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyPrefabs:
-  - {fileID: 8396144676467672943, guid: 5ef7b8a19a7581a4d8ad135e16067e52, type: 3}
-  - {fileID: 8396144676467672943, guid: f0fd75e72e8fcb145bf08ce720e3f630, type: 3}
-  - {fileID: 8396144676467672943, guid: 524ec7d42790caa4d8dcb2fd8939a68e, type: 3}
-  - {fileID: 8396144676467672943, guid: fcd77899ae68f8b47976c7810244c984, type: 3}
-  - {fileID: 8396144676467672943, guid: 86b6f6c3f076a94449ecc42ebadaf690, type: 3}
+  database: {fileID: 1925012465}
   spawnPoint: {fileID: 1604599326}
 --- !u!114 &1925012462
 MonoBehaviour:
@@ -2097,6 +2093,24 @@ MonoBehaviour:
   worldCanvas: {fileID: 1889954654}
   screenFlashImage: {fileID: 1581419598}
   powerReadyText: {fileID: 451323105}
+--- !u!114 &1925012465
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1925012458}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4824d0f7cbf5a64479f633977e4044ae, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allEnemies:
+  - {fileID: 11400000, guid: 860b81c72fc89114a85c674dceaa8621, type: 2}
+  - {fileID: 11400000, guid: 0725e73210e4f7a43ade0567ebd54b7e, type: 2}
+  - {fileID: 11400000, guid: 91b32d65a191d1242829a2b7fe9d64fd, type: 2}
+  - {fileID: 11400000, guid: b28205ddabe15d143a4f014ddaf1980d, type: 2}
+  - {fileID: 11400000, guid: c8a9260e2aa554049952e8b0bb351e3a, type: 2}
 --- !u!1 &2026361160
 GameObject:
   m_ObjectHideFlags: 0

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class CombatManager : MonoBehaviour
 {
@@ -179,6 +180,8 @@ public class CombatManager : MonoBehaviour
 
             FindObjectOfType<EnemySpawner>().DestroyCurrentEnemy();
 
+            StartCoroutine(ReturnToMainAfterDelay());
+
             return;
         }
 
@@ -189,6 +192,12 @@ public class CombatManager : MonoBehaviour
             ui.UpdateBoardLockVisual(currentState);
             return;
         }
+    }
+
+    IEnumerator ReturnToMainAfterDelay()
+    {
+        yield return new WaitForSeconds(2f);
+        SceneManager.LoadScene("Main");
     }
 
 }

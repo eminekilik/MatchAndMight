@@ -11,6 +11,9 @@ public class WorldEnemy : MonoBehaviour
     private bool playerInRange = false;
     private Camera mainCamera;
 
+    [Header("Enemy Data")]
+    public EnemyData enemyData;
+
     void Start()
     {
 
@@ -75,6 +78,7 @@ public class WorldEnemy : MonoBehaviour
 
     void StartBattle()
     {
+        BattleData.selectedEnemyID = enemyData.enemyID;
         SceneManager.LoadScene("Battle");
     }
 }

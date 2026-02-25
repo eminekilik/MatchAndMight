@@ -2,8 +2,7 @@ using UnityEngine;
 
 public class EnemySpawner : MonoBehaviour
 {
-    [Header("Enemy Prefabs")]
-    public GameObject[] enemyPrefabs;
+    public EnemyDatabase database;
 
     [Header("Spawn Point")]
     public Transform spawnPoint;
@@ -17,22 +16,29 @@ public class EnemySpawner : MonoBehaviour
 
     void SpawnEnemy()
     {
-        if (enemyPrefabs == null || enemyPrefabs.Length == 0)
+        string id = BattleData.selectedEnemyID;
+
+        if (string.IsNullOrEmpty(id))
         {
-            Debug.LogWarning("Enemy Prefabs boþ!");
+            Debug.LogWarning("Enemy ID boþ!");
             return;
         }
 
-        int index = Random.Range(0, enemyPrefabs.Length);
+        EnemyData data = database.GetEnemyByID(id);
+
+        if (data == null)
+        {
+            Debug.LogWarning("Enemy data bulunamadý!");
+            return;
+        }
 
         currentEnemy = Instantiate(
-            enemyPrefabs[index],
+            data.battlePrefab,
             spawnPoint.position,
             Quaternion.identity
         );
 
         CombatManager.Instance.ui.SetEnemyBarActive(true);
-
         CombatManager.Instance.effects.SetEnemy(currentEnemy.transform);
     }
 
