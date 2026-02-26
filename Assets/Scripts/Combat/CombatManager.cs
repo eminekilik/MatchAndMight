@@ -39,6 +39,9 @@ public class CombatManager : MonoBehaviour
     public CombatProjectileController projectiles;
     public CombatEffectsController effects;
 
+    [Header("Enemy Animation")]
+    public Animator enemyAnimator;
+
     void Awake()
     {
         Instance = this;
@@ -158,7 +161,17 @@ public class CombatManager : MonoBehaviour
         if (currentState == CombatState.Win || currentState == CombatState.Lose)
             yield break;
 
-        projectiles.FireEnemyProjectile(effects.enemyWorldTarget, effects.playerWorldTarget);
+        // ?? Attack animasyonu baþlat
+        if (enemyAnimator != null)
+            enemyAnimator.SetTrigger("Attack");
+
+        // Vuruþ zamanlamasý
+        //yield return new WaitForSeconds(0.4f);
+
+        projectiles.FireEnemyProjectile(
+            effects.enemyWorldTarget,
+            effects.playerWorldTarget
+        );
 
         yield return new WaitForSeconds(1f);
 
@@ -200,4 +213,8 @@ public class CombatManager : MonoBehaviour
         SceneManager.LoadScene("Main");
     }
 
+    public void SetEnemyAnimator(Animator anim)
+    {
+        enemyAnimator = anim;
+    }
 }

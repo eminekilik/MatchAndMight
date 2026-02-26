@@ -40,6 +40,13 @@ public class EnemySpawner : MonoBehaviour
 
         CombatManager.Instance.ui.SetEnemyBarActive(true);
         CombatManager.Instance.effects.SetEnemy(currentEnemy.transform);
+
+        Animator anim = currentEnemy.GetComponent<Animator>();
+
+        if (anim != null)
+        {
+            CombatManager.Instance.SetEnemyAnimator(anim);
+        }
     }
 
     public void DestroyCurrentEnemy()
