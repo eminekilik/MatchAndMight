@@ -38,6 +38,8 @@ public class EnemySpawner : MonoBehaviour
             Quaternion.identity
         );
 
+        CombatManager.Instance.SetEnemyData(data);
+
         CombatManager.Instance.ui.SetEnemyBarActive(true);
         CombatManager.Instance.effects.SetEnemy(currentEnemy.transform);
 

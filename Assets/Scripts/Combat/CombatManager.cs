@@ -42,6 +42,9 @@ public class CombatManager : MonoBehaviour
     [Header("Enemy Animation")]
     public Animator enemyAnimator;
 
+    private EnemyData currentEnemyData;
+
+
     void Awake()
     {
         Instance = this;
@@ -188,6 +191,10 @@ public class CombatManager : MonoBehaviour
         if (enemyHP <= 0 && currentState != CombatState.Win)
         {
             currentState = CombatState.Win;
+
+            int earnedXP = CalculateXP();
+            PlayerLevelSystem.Instance.AddXP(earnedXP);
+
             ui.UpdateTurnUI(currentState);
             ui.UpdateBoardLockVisual(currentState);
 
@@ -216,5 +223,35 @@ public class CombatManager : MonoBehaviour
     public void SetEnemyAnimator(Animator anim)
     {
         enemyAnimator = anim;
+    }
+
+    public void SetEnemyData(EnemyData data)
+    {
+        currentEnemyData = data;
+
+        enemyMaxHP = data.maxHealth;
+        enemyHP = enemyMaxHP;
+    }
+
+    int CalculateXP()
+    {
+        if (currentEnemyData == null)
+            return 0;
+
+        int playerLevel = PlayerLevelSystem.Instance.level;
+        int enemyLevel = currentEnemyData.level;
+
+        float multiplier = 1f;
+
+        int diff = enemyLevel - playerLevel;
+
+        if (diff > 0)
+            multiplier += diff * 0.25f;     // yüksek level düþman bonus
+        else if (diff < 0)
+            multiplier += diff * 0.15f;     // düþük level düþman ceza
+
+        int xp = Mathf.RoundToInt(currentEnemyData.baseXPReward * multiplier);
+
+        return Mathf.Max(5, xp);
     }
 }

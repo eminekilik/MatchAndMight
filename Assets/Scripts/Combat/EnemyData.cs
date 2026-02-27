@@ -14,4 +14,8 @@ public class EnemyData : ScriptableObject
     [Header("Stats")]
     public int maxHealth;
     public int attack;
+
+    [Header("Progression")]
+    public int level = 1;
+    public int baseXPReward = 50;
 }
