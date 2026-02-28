@@ -15,5 +15,7 @@ MonoBehaviour:
   enemyID: 4
   battlePrefab: {fileID: 8396144676467672943, guid: fcd77899ae68f8b47976c7810244c984, type: 3}
   worldSprite: {fileID: -594197781322936934, guid: fba04cf817a7246ec99f9c85cf9ef600, type: 3}
-  maxHealth: 100
-  attack: 10
+  maxHealth: 150
+  attack: 15
+  level: 2
+  baseXPReward: 50

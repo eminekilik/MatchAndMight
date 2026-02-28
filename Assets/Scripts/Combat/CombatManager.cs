@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -44,6 +45,14 @@ public class CombatManager : MonoBehaviour
 
     private EnemyData currentEnemyData;
 
+    [Header("Result Panels")]
+    public GameObject winPanel;
+    public GameObject losePanel;
+
+    [Header("Result XP Texts")]
+    public TMP_Text winXPText;
+    public TMP_Text loseXPText;
+
 
     void Awake()
     {
@@ -60,6 +69,9 @@ public class CombatManager : MonoBehaviour
         playerHP = playerMaxHP;
         enemyHP = enemyMaxHP;
         playerMana = 0;
+
+        if (winPanel != null) winPanel.SetActive(false);
+        if (losePanel != null) losePanel.SetActive(false);
 
         ui.SetupSliders(playerMaxHP, enemyMaxHP, playerMaxMana);
         ui.UpdateUI(playerHP, playerMana, enemyHP);
@@ -193,14 +205,19 @@ public class CombatManager : MonoBehaviour
             currentState = CombatState.Win;
 
             int earnedXP = CalculateXP();
-            PlayerLevelSystem.Instance.AddXP(earnedXP);
+            PlayerLevelSystem.Instance.AddXP(earnedXP); // Sadece kazanýnca ekle
 
             ui.UpdateTurnUI(currentState);
             ui.UpdateBoardLockVisual(currentState);
 
             FindObjectOfType<EnemySpawner>().DestroyCurrentEnemy();
 
-            StartCoroutine(ReturnToMainAfterDelay());
+            // Win panel aç ve XP yazdýr
+            if (winXPText != null)
+                winXPText.text = earnedXP + " XP";
+
+            if (winPanel != null)
+                winPanel.SetActive(true);
 
             return;
         }
@@ -208,8 +225,19 @@ public class CombatManager : MonoBehaviour
         if (playerHP <= 0 && currentState != CombatState.Lose)
         {
             currentState = CombatState.Lose;
+
+            int earnedXP = CalculateXP(); // sadece göstermek için hesapla
+
             ui.UpdateTurnUI(currentState);
             ui.UpdateBoardLockVisual(currentState);
+
+            // Lose panel aç ve XP yazdýr
+            if (loseXPText != null)
+                loseXPText.text = earnedXP + " XP"; // kaybedilen XP çarpý iþareti ile
+
+            if (losePanel != null)
+                losePanel.SetActive(true);
+
             return;
         }
     }
@@ -253,5 +281,10 @@ public class CombatManager : MonoBehaviour
         int xp = Mathf.RoundToInt(currentEnemyData.baseXPReward * multiplier);
 
         return Mathf.Max(5, xp);
+    }
+
+    public void BackToMap()
+    {
+        SceneManager.LoadScene("Main");
     }
 }
