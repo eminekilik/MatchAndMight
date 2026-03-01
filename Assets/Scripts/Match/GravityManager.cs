@@ -80,17 +80,21 @@ public class GravityManager : MonoBehaviour
 
     private IEnumerator MoveAnimation(Gem gem, Vector3 targetPos)
     {
+        if (gem == null) yield break; // baþta yoksa dur
+
         Vector3 startPos = gem.transform.position;
         float t = 0f;
 
         while (t < 1f)
         {
+            if (gem == null) yield break; // yok edilirse Coroutine’i sonlandýr
             t += Time.deltaTime * 8f;
             gem.transform.position = Vector3.Lerp(startPos, targetPos, t);
             yield return null;
         }
 
-        gem.transform.position = targetPos;
+        if (gem != null)
+            gem.transform.position = targetPos;
     }
 
     private void SpawnNewGems()

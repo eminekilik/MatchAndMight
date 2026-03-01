@@ -27,7 +27,7 @@ public class CombatManager : MonoBehaviour
     private bool manaFullReady = false;
 
     [Header("Enemy")]
-    public int enemyMaxHP = 1000;
+    public int enemyMaxHP;
     public int enemyHP;
 
     [Header("Gem Values")]
@@ -43,7 +43,7 @@ public class CombatManager : MonoBehaviour
     [Header("Enemy Animation")]
     public Animator enemyAnimator;
 
-    private EnemyData currentEnemyData;
+    public EnemyData currentEnemyData;
 
     [Header("Result Panels")]
     public GameObject winPanel;
@@ -259,6 +259,9 @@ public class CombatManager : MonoBehaviour
 
         enemyMaxHP = data.maxHealth;
         enemyHP = enemyMaxHP;
+
+        ui.SetupSliders(playerMaxHP, enemyMaxHP, playerMaxMana);
+        ui.UpdateUI(playerHP, playerMana, enemyHP);
     }
 
     int CalculateXP()

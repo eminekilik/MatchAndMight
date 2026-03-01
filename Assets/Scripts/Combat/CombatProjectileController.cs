@@ -45,7 +45,17 @@ public class CombatProjectileController : MonoBehaviour
         {
             ep.SetTarget(playerTarget, () =>
             {
-                int damage = Random.Range(6, 14);
+                int damage = 0;
+                if (CombatManager.Instance.currentEnemyData != null)
+                {
+                    // attack değerini al, istersen randomize edebilirsin
+                    damage = Random.Range(CombatManager.Instance.currentEnemyData.attack - 2,
+                                          CombatManager.Instance.currentEnemyData.attack + 3);
+                }
+                else
+                {
+                    damage = Random.Range(6, 14); // fallback
+                }
                 CombatManager.Instance.playerHP -= damage;
 
                 CombatManager.Instance.ClampValues();
