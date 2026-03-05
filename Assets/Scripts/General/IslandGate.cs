@@ -1,14 +1,17 @@
+using System.Collections;
 using UnityEngine;
+using TMPro;
 
 public class IslandGate : MonoBehaviour
 {
-    [Header("Gate Settings")]
     public int requiredLevel = 5;
 
-    private Collider2D gateCollider;
-    private bool isUnlocked = false;
+    [Header("UI")]
+    public TMP_Text warningText;
 
-    private void Awake()
+    private Collider2D gateCollider;
+
+    void Awake()
     {
         gateCollider = GetComponent<Collider2D>();
     }
@@ -18,31 +21,32 @@ public class IslandGate : MonoBehaviour
         if (!collision.gameObject.CompareTag("Player"))
             return;
 
-        if (isUnlocked)
-            return;
-
         int playerLevel = PlayerLevelSystem.Instance.level;
 
         if (playerLevel >= requiredLevel)
         {
-            UnlockGate();
+            gateCollider.enabled = false;
         }
         else
         {
-            LockedFeedback();
+            ShowWarning();
         }
     }
 
-    void UnlockGate()
+    void ShowWarning()
     {
-        isUnlocked = true;
-        gateCollider.enabled = false; // Artýk geçilebilir
-        Debug.Log("Gate unlocked!");
+        if (warningText == null)
+            return;
+
+        warningText.gameObject.SetActive(true);
+        warningText.text = "You need Level " + requiredLevel + " to enter this island.";
+
+        StartCoroutine(HideWarning());
     }
 
-    void LockedFeedback()
+    IEnumerator HideWarning()
     {
-        Debug.Log("Level " + requiredLevel + " required.");
-        // Buraya UI popup baðlayabiliriz
+        yield return new WaitForSeconds(2f);
+        warningText.gameObject.SetActive(false);
     }
 }
