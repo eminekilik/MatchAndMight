@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ef871cf43ae52647ab73d376e6d98ca, type: 3}
+  m_Name: BlueArcher
+  m_EditorClassIdentifier: 
+  enemyID: 13
+  battlePrefab: {fileID: 8396144676467672943, guid: b3079821f9ec0044889190224f781b61, type: 3}
+  worldSprite: {fileID: 7257567913506708742, guid: 72c22f22ea5e4488390ba536cd5ab98d, type: 3}
+  maxHealth: 400
+  attack: 40
+  level: 1
+  baseXPReward: 325

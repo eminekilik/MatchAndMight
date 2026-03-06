@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ef871cf43ae52647ab73d376e6d98ca, type: 3}
-  m_Name: BlueLancer
+  m_Name: BlackWarrior
   m_EditorClassIdentifier: 
-  enemyID: 2
-  battlePrefab: {fileID: 8396144676467672943, guid: f0fd75e72e8fcb145bf08ce720e3f630, type: 3}
-  worldSprite: {fileID: -594197781322936934, guid: 2307ce0d618cb4ea2be2cb2a4148cbde, type: 3}
-  maxHealth: 250
-  attack: 25
-  level: 4
-  baseXPReward: 50
+  enemyID: 20
+  battlePrefab: {fileID: 8396144676467672943, guid: abcbac6b9378a824494a733daceaf175, type: 3}
+  worldSprite: {fileID: 7384290322352760091, guid: 728135fe2ac4b434ab56e445d647d2a0, type: 3}
+  maxHealth: 575
+  attack: 57
+  level: 1
+  baseXPReward: 500

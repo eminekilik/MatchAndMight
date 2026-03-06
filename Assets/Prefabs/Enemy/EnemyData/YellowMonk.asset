@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ef871cf43ae52647ab73d376e6d98ca, type: 3}
+  m_Name: YellowMonk
+  m_EditorClassIdentifier: 
+  enemyID: 3
+  battlePrefab: {fileID: 8396144676467672943, guid: e68fb45a8e319f948b844f049cd122b6, type: 3}
+  worldSprite: {fileID: 4723107735738678597, guid: d69e3be544b764174a6deb465428148d, type: 3}
+  maxHealth: 150
+  attack: 15
+  level: 1
+  baseXPReward: 75

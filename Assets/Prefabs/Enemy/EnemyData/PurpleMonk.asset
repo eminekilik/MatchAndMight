@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ef871cf43ae52647ab73d376e6d98ca, type: 3}
+  m_Name: PurpleMonk
+  m_EditorClassIdentifier: 
+  enemyID: 11
+  battlePrefab: {fileID: 8396144676467672943, guid: dc40c10f5efbf07409f5fa634dccc466, type: 3}
+  worldSprite: {fileID: 4723107735738678597, guid: fe0068d0659704ab6a796ee3d8b72476, type: 3}
+  maxHealth: 350
+  attack: 35
+  level: 1
+  baseXPReward: 275

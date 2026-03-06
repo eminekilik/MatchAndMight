@@ -1,0 +1,21 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5ef871cf43ae52647ab73d376e6d98ca, type: 3}
+  m_Name: RedArcher
+  m_EditorClassIdentifier: 
+  enemyID: 5
+  battlePrefab: {fileID: 8396144676467672943, guid: e5214e93e6584de40b97a2993491162b, type: 3}
+  worldSprite: {fileID: 7257567913506708742, guid: 277a50fd24135436398811e3293b2aa2, type: 3}
+  maxHealth: 200
+  attack: 20
+  level: 1
+  baseXPReward: 125

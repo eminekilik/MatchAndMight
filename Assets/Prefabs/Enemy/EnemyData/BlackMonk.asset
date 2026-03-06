@@ -10,10 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ef871cf43ae52647ab73d376e6d98ca, type: 3}
-  m_Name: YellowLancer
+  m_Name: BlackMonk
   m_EditorClassIdentifier: 
-  enemyID: 5
-  battlePrefab: {fileID: 8396144676467672943, guid: 86b6f6c3f076a94449ecc42ebadaf690, type: 3}
-  worldSprite: {fileID: -594197781322936934, guid: 402bdd4018d3a420c98a285607e2b06d, type: 3}
-  maxHealth: 100
-  attack: 10
+  enemyID: 19
+  battlePrefab: {fileID: 8396144676467672943, guid: 6bd6375347c3a3a43abd464f5a18e6be, type: 3}
+  worldSprite: {fileID: 4723107735738678597, guid: 2018574d4308f4786a63ea08083f13cc, type: 3}
+  maxHealth: 550
+  attack: 55
+  level: 1
+  baseXPReward: 475

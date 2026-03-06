@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5ef871cf43ae52647ab73d376e6d98ca, type: 3}
-  m_Name: RedLancer
+  m_Name: PurpleArcher
   m_EditorClassIdentifier: 
-  enemyID: 4
-  battlePrefab: {fileID: 8396144676467672943, guid: fcd77899ae68f8b47976c7810244c984, type: 3}
-  worldSprite: {fileID: -594197781322936934, guid: fba04cf817a7246ec99f9c85cf9ef600, type: 3}
-  maxHealth: 150
-  attack: 15
-  level: 2
-  baseXPReward: 50
+  enemyID: 9
+  battlePrefab: {fileID: 8396144676467672943, guid: 0408d825158fd1141888750c12a69c6c, type: 3}
+  worldSprite: {fileID: 7257567913506708742, guid: abc79d95ca2994e20b019ba42fccbcb9, type: 3}
+  maxHealth: 300
+  attack: 30
+  level: 1
+  baseXPReward: 225
