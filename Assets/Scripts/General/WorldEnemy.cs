@@ -79,6 +79,8 @@ public class WorldEnemy : MonoBehaviour
     void StartBattle()
     {
         BattleData.selectedEnemyID = enemyData.enemyID;
+        PlayerPositionData.lastPosition = player.position;
+        PlayerPositionData.hasSavedPosition = true;
         SceneManager.LoadScene("Battle");
     }
 }

@@ -29,6 +29,13 @@ public class PlayerMovement : MonoBehaviour
 
         targetPosition = transform.position;
         lastPosition = rb.position;
+
+        if (PlayerPositionData.hasSavedPosition)
+        {
+            rb.position = PlayerPositionData.lastPosition;
+            targetPosition = PlayerPositionData.lastPosition;
+            PlayerPositionData.hasSavedPosition = false;
+        }
     }
 
     void Update()
