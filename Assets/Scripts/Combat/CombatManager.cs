@@ -219,14 +219,15 @@ public class CombatManager : MonoBehaviour
             ui.UpdateTurnUI(currentState);
             ui.UpdateBoardLockVisual(currentState);
 
-            FindObjectOfType<EnemySpawner>().DestroyCurrentEnemy();
+            //FindObjectOfType<EnemySpawner>().DestroyCurrentEnemy();
+            StartCoroutine(EnemyDeathRoutine());
 
-            // Win panel aç ve XP yazdýr
-            if (winXPText != null)
-                winXPText.text = earnedXP + " XP";
+            //// Win panel aç ve XP yazdýr
+            //if (winXPText != null)
+            //    winXPText.text = earnedXP + " XP";
 
-            if (winPanel != null)
-                winPanel.SetActive(true);
+            //if (winPanel != null)
+            //    winPanel.SetActive(true);
 
             return;
         }
@@ -249,6 +250,25 @@ public class CombatManager : MonoBehaviour
 
             return;
         }
+    }
+
+    IEnumerator EnemyDeathRoutine()
+    {
+        if (enemyAnimator != null)
+            enemyAnimator.SetBool("isDead", true);
+
+        // animasyon süresi
+        yield return new WaitForSeconds(1.5f);
+
+        FindObjectOfType<EnemySpawner>().DestroyCurrentEnemy();
+
+        int earnedXP = CalculateXP();
+
+        if (winXPText != null)
+            winXPText.text = earnedXP + " XP";
+
+        if (winPanel != null)
+            winPanel.SetActive(true);
     }
 
     IEnumerator ReturnToMainAfterDelay()
