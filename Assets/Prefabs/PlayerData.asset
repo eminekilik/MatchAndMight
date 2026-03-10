@@ -13,8 +13,8 @@ MonoBehaviour:
   m_Name: PlayerData
   m_EditorClassIdentifier: 
   baseHealth: 100
-  baseAttack: 2
+  baseAttack: 5
   baseMana: 100
   healthPerLevel: 15
-  attackPerLevel: 1
+  attackPerLevel: 5
   manaPerLevel: 5

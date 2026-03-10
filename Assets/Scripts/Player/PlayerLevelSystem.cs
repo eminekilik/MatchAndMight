@@ -32,6 +32,8 @@ public class PlayerLevelSystem : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded; // sahne yüklendiðinde tetikle
+
+            LoadPlayerLevel();
         }
         else
         {
@@ -90,6 +92,7 @@ public class PlayerLevelSystem : MonoBehaviour
             currentXP += step;
             remainingXP -= step;
 
+            SavePlayerLevel();
             if (currentXP >= requiredXP)
             {
                 currentXP = requiredXP;
@@ -118,6 +121,8 @@ public class PlayerLevelSystem : MonoBehaviour
         Debug.Log("Level Up! Yeni Level: " + level);
 
         UpdateUI(); // slider ve level text güncellenir
+
+        SavePlayerLevel();
     }
 
     void UpdateUI()
@@ -135,5 +140,24 @@ public class PlayerLevelSystem : MonoBehaviour
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= OnSceneLoaded;
+    }
+
+    void SavePlayerLevel()
+    {
+        PlayerPrefs.SetInt("PlayerLevel", level);
+        PlayerPrefs.SetInt("PlayerXP", currentXP);
+        PlayerPrefs.SetInt("PlayerRequiredXP", requiredXP);
+
+        PlayerPrefs.Save();
+    }
+
+    void LoadPlayerLevel()
+    {
+        if (PlayerPrefs.HasKey("PlayerLevel"))
+        {
+            level = PlayerPrefs.GetInt("PlayerLevel");
+            currentXP = PlayerPrefs.GetInt("PlayerXP");
+            requiredXP = PlayerPrefs.GetInt("PlayerRequiredXP");
+        }
     }
 }
