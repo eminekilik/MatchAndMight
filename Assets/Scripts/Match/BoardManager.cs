@@ -21,6 +21,10 @@ public class BoardManager : MonoBehaviour
     public float swapDuration = 0.15f;
     private bool isShuffling;
 
+    [Header("Luck System")]
+    [Range(0f, 1f)]
+    public float luckFactor = 0.2f;
+
     void Awake()
     {
         Instance = this;
@@ -82,7 +86,8 @@ public class BoardManager : MonoBehaviour
 
     public void SpawnGemFromTop(int x, int y)
     {
-        Gem prefab = gemPrefabs[Random.Range(0, gemPrefabs.Length)];
+        //Gem prefab = gemPrefabs[Random.Range(0, gemPrefabs.Length)];
+        Gem prefab = GetControlledRandomGem(x, y);
         Vector3 spawnPos = GetTile(x, height - 1).transform.position + Vector3.up * tileSize;
 
         Gem gem = Instantiate(prefab, spawnPos, Quaternion.identity, GetTile(x, y).transform);
@@ -359,4 +364,76 @@ public class BoardManager : MonoBehaviour
     }
 
     #endregion
+
+    Gem GetSafeGem(int x, int y)
+    {
+        List<Gem> possible = new List<Gem>(gemPrefabs);
+
+        if (x >= 2)
+        {
+            Gem left1 = GetTile(x - 1, y).currentGem;
+            Gem left2 = GetTile(x - 2, y).currentGem;
+
+            if (left1 != null && left2 != null && left1.gemType == left2.gemType)
+                possible.RemoveAll(g => g.gemType == left1.gemType);
+        }
+
+        if (y >= 2)
+        {
+            Gem down1 = GetTile(x, y - 1).currentGem;
+            Gem down2 = GetTile(x, y - 2).currentGem;
+
+            if (down1 != null && down2 != null && down1.gemType == down2.gemType)
+                possible.RemoveAll(g => g.gemType == down1.gemType);
+        }
+
+        if (possible.Count == 0)
+            return gemPrefabs[Random.Range(0, gemPrefabs.Length)];
+
+        return possible[Random.Range(0, possible.Count)];
+    }
+
+    Gem GetControlledRandomGem(int x, int y)
+    {
+        if (MatchDestroyer.Instance != null &&
+        MatchDestroyer.Instance.cascadeCount >= MatchDestroyer.Instance.maxCascade)
+        {
+            // cascade limit dolduysa match oluþmasýný tamamen engelle
+            return GetSafeGem(x, y);
+        }
+
+        List<Gem> possible = new List<Gem>(gemPrefabs);
+
+        // yatay kontrol
+        if (x >= 2)
+        {
+            Gem left1 = GetTile(x - 1, y).currentGem;
+            Gem left2 = GetTile(x - 2, y).currentGem;
+
+            if (left1 != null && left2 != null && left1.gemType == left2.gemType)
+            {
+                possible.RemoveAll(g => g.gemType == left1.gemType);
+            }
+        }
+
+        // dikey kontrol
+        if (y >= 2)
+        {
+            Gem down1 = GetTile(x, y - 1).currentGem;
+            Gem down2 = GetTile(x, y - 2).currentGem;
+
+            if (down1 != null && down2 != null && down1.gemType == down2.gemType)
+            {
+                possible.RemoveAll(g => g.gemType == down1.gemType);
+            }
+        }
+
+        // Luck sistemi
+        if (Random.value < luckFactor)
+        {
+            return possible[Random.Range(0, possible.Count)];
+        }
+
+        return gemPrefabs[Random.Range(0, gemPrefabs.Length)];
+    }
 }

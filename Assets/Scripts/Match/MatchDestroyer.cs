@@ -9,6 +9,10 @@ public class MatchDestroyer : MonoBehaviour
     public System.Action<Dictionary<GemType, int>, Vector3> OnMatchesResolved;
     public System.Action OnResolveFinished;
 
+    [Header("Cascade Control")]
+    public int maxCascade = 3;
+    public int cascadeCount = 0;
+
     void Awake()
     {
         Instance = this;
@@ -16,6 +20,7 @@ public class MatchDestroyer : MonoBehaviour
 
     public void ResolveMatches()
     {
+        cascadeCount = 0;
         StartCoroutine(ResolveLoop());
     }
 
@@ -25,7 +30,7 @@ public class MatchDestroyer : MonoBehaviour
         {
             List<Gem> matches = MatchManager.Instance.GetAllMatches();
             if (matches.Count == 0) break;
-
+            cascadeCount++;
             yield return StartCoroutine(DestroyMatchesCoroutine(matches));
             yield return new WaitForSeconds(0.15f);
         }
