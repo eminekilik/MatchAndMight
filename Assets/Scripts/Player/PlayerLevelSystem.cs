@@ -123,6 +123,8 @@ public class PlayerLevelSystem : MonoBehaviour
         UpdateUI(); // slider ve level text güncellenir
 
         SavePlayerLevel();
+
+        FindObjectOfType<UpgradePanel>().OpenPanel();
     }
 
     void UpdateUI()

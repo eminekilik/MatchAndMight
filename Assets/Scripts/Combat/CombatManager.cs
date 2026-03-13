@@ -69,9 +69,17 @@ public class CombatManager : MonoBehaviour
 
         int level = PlayerLevelSystem.Instance.level;
 
-        playerMaxHP = playerData.baseHealth + (playerData.healthPerLevel * (level - 1));
-        redDamage = playerData.baseAttack + (playerData.attackPerLevel * (level - 1));
-        playerMaxMana = playerData.baseMana + (playerData.manaPerLevel * (level - 1));
+        playerMaxHP = playerData.baseHealth
+             + (playerData.healthPerLevel * (level - 1))
+             + playerData.bonusHealth;
+
+        redDamage = playerData.baseAttack
+                  + (playerData.attackPerLevel * (level - 1))
+                  + playerData.bonusAttack;
+
+        playerMaxMana = playerData.baseMana
+                      + (playerData.manaPerLevel * (level - 1))
+                      + playerData.bonusMana;
 
         currentState = CombatState.PlayerTurn;
 

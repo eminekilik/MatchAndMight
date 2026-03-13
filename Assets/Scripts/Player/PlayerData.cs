@@ -12,4 +12,9 @@ public class PlayerData : ScriptableObject
     public int healthPerLevel = 15;
     public int attackPerLevel = 1;
     public int manaPerLevel = 5;
+
+    [Header("Upgrade Bonuses")]
+    public int bonusHealth = 0;
+    public int bonusAttack = 0;
+    public int bonusMana = 0;
 }
