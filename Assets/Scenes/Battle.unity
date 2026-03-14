@@ -2273,7 +2273,7 @@ MonoBehaviour:
   - {fileID: 1558816947045966793, guid: e5c337e5894df97468761a7a6e7a4c6a, type: 3}
   - {fileID: 448025075340840488, guid: 42fc88aed9a5ff34991636c5757af6e7, type: 3}
   swapDuration: 0.15
-  luckFactor: 0.5
+  luckFactor: 1
 --- !u!4 &1088039118
 Transform:
   m_ObjectHideFlags: 0

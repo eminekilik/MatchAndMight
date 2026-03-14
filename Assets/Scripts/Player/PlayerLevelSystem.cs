@@ -124,7 +124,7 @@ public class PlayerLevelSystem : MonoBehaviour
 
         SavePlayerLevel();
 
-        FindObjectOfType<UpgradePanel>().OpenPanel();
+        FindObjectOfType<UpgradePanel>(true).OpenPanel();
     }
 
     void UpdateUI()
