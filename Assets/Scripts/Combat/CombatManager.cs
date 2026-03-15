@@ -67,19 +67,11 @@ public class CombatManager : MonoBehaviour
         MatchDestroyer.Instance.OnMatchesResolved += HandleMatches;
         MatchDestroyer.Instance.OnResolveFinished += HandleResolveFinished;
 
-        int level = PlayerLevelSystem.Instance.level;
+        playerData.RecalculateStats(PlayerLevelSystem.Instance.level);
 
-        playerMaxHP = playerData.baseHealth
-             + (playerData.healthPerLevel * (level - 1))
-             + playerData.bonusHealth;
-
-        redDamage = playerData.baseAttack
-                  + (playerData.attackPerLevel * (level - 1))
-                  + playerData.bonusAttack;
-
-        playerMaxMana = playerData.baseMana
-                      + (playerData.manaPerLevel * (level - 1))
-                      + playerData.bonusMana;
+        playerMaxHP = playerData.currentHealth;
+        blueMana = playerData.currentManaGain;
+        redDamage = playerData.currentAttack;
 
         currentState = CombatState.PlayerTurn;
 

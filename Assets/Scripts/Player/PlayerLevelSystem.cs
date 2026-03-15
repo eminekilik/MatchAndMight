@@ -8,6 +8,8 @@ public class PlayerLevelSystem : MonoBehaviour
 {
     public static PlayerLevelSystem Instance;
 
+    public PlayerData playerData;
+
     [Header("Level Settings")]
     public int level = 1;
     public int currentXP = 0;
@@ -34,6 +36,10 @@ public class PlayerLevelSystem : MonoBehaviour
             SceneManager.sceneLoaded += OnSceneLoaded; // sahne yüklendiðinde tetikle
 
             LoadPlayerLevel();
+            if (playerData != null)
+            {
+                playerData.RecalculateStats(level);
+            }
         }
         else
         {
@@ -119,7 +125,7 @@ public class PlayerLevelSystem : MonoBehaviour
         level++;
         requiredXP = Mathf.RoundToInt(requiredXP * 1.4f);
         Debug.Log("Level Up! Yeni Level: " + level);
-
+        playerData.RecalculateStats(level); 
         UpdateUI(); // slider ve level text güncellenir
 
         SavePlayerLevel();
