@@ -13,7 +13,8 @@ public class ProfilePanel : MonoBehaviour
 
     void Start()
     {
-        profilePanel.SetActive(false);
+        //profilePanel.SetActive(false);
+        playerData.RecalculateStats(PlayerLevelSystem.Instance.level);
     }
 
     public void OpenPanel()

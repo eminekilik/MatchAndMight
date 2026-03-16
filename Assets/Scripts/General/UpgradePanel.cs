@@ -11,7 +11,7 @@ public class UpgradePanel : MonoBehaviour
     public void OpenPanel()
     {
         panel.SetActive(true);
-        Time.timeScale = 0f;
+        //Time.timeScale = 0f;
     }
 
     public void UpgradeHealth()
@@ -35,6 +35,6 @@ public class UpgradePanel : MonoBehaviour
     void ClosePanel()
     {
         panel.SetActive(false);
-        Time.timeScale = 1f;
+        //Time.timeScale = 1f;
     }
 }

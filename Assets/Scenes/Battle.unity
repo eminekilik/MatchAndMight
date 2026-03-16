@@ -217,7 +217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 69699280b32bd934e8b0291beb354530, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxCascade: 1
+  maxCascade: 3
   cascadeCount: 0
 --- !u!114 &53182249
 MonoBehaviour:

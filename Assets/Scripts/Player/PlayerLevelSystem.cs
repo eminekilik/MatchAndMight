@@ -35,6 +35,11 @@ public class PlayerLevelSystem : MonoBehaviour
             DontDestroyOnLoad(gameObject);
             SceneManager.sceneLoaded += OnSceneLoaded; // sahne yüklendiðinde tetikle
 
+            if (playerData == null)
+            {
+                playerData = Resources.Load<PlayerData>("PlayerData");
+            }
+
             LoadPlayerLevel();
             if (playerData != null)
             {
