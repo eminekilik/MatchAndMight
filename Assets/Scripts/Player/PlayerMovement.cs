@@ -52,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
 
     void HandleInput()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             if (EventSystem.current.IsPointerOverGameObject())
                 return;
@@ -62,35 +62,40 @@ public class PlayerMovement : MonoBehaviour
             targetPosition = worldPoint;
             isMoving = true;
         }
+        else
+        {
+            isMoving = false;
+        }
     }
 
     void HandleMovement()
     {
-        if (!isMoving) return;
+        if (!isMoving)
+        {
+            rb.velocity = Vector2.zero;
+            return;
+        }
 
-        Vector2 newPosition = Vector2.MoveTowards
-        (
-            rb.position,
-            targetPosition,
-            moveSpeed * Time.fixedDeltaTime
-        );
+        Vector2 direction = (targetPosition - transform.position);
+        float distance = direction.magnitude;
 
-        rb.MovePosition(newPosition);
+        direction.Normalize();
 
-        Vector3 direction = targetPosition - transform.position;
+        rb.velocity = direction * moveSpeed;
 
+        // Flip
         if (direction.x > 0.01f)
             transform.localScale = new Vector3(1, 1, 1);
         else if (direction.x < -0.01f)
             transform.localScale = new Vector3(-1, 1, 1);
 
-        float distance = Vector3.Distance(rb.position, targetPosition);
-
+        // STOP kontrolü (KRÝTÝK)
         if (distance <= stopDistance)
         {
-            isMoving = false;
+            rb.velocity = Vector2.zero;
         }
 
+        // Enemy kontrolü aynen kalsýn
         if (movingToEnemy && currentEnemyTarget != null)
         {
             float enemyDistance = Vector3.Distance(rb.position, currentEnemyTarget.position);
@@ -107,13 +112,8 @@ public class PlayerMovement : MonoBehaviour
 
     void UpdateAnimation()
     {
-        float movedDistance = Vector2.Distance(rb.position, lastPosition);
-
-        bool actuallyMoving = movedDistance > 0.001f;
-
-        animator.SetBool("isWalking", actuallyMoving);
-
-        lastPosition = rb.position;
+        float speed = rb.velocity.magnitude;
+        animator.SetBool("isWalking", speed > 0.05f);
     }
 
     void StartBattle()
