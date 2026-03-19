@@ -1,0 +1,19 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3f494a0b6a3c2bd41a57fc267e96255e, type: 3}
+  m_Name: 1
+  m_EditorClassIdentifier: 
+  questName: Yellow Archer
+  targetEnemy: {fileID: 11400000, guid: 60aecb7821880444fa5d931db0031d20, type: 2}
+  requiredAmount: 3
+  rewardXP: 25
+  questIcon: {fileID: 21300000, guid: 50d984ed102d3422a869cd614752957f, type: 3}

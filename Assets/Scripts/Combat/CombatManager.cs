@@ -260,6 +260,7 @@ public class CombatManager : MonoBehaviour
         // animasyon süresi
         yield return new WaitForSeconds(1.5f);
 
+        QuestManager.Instance.OnEnemyKilled(currentEnemyData);
         FindObjectOfType<EnemySpawner>().DestroyCurrentEnemy();
 
         int earnedXP = CalculateXP();
