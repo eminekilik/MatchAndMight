@@ -30,5 +30,6 @@ public class QuestRuntime
         PlayerLevelSystem.Instance.AddXP(data.rewardXP);
 
         QuestManager.Instance.GiveNextQuest();
+        QuestManager.Instance.SaveQuest();
     }
 }

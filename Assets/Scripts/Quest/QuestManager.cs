@@ -10,16 +10,28 @@ public class QuestManager : MonoBehaviour
 
     private int questIndex = 0;
 
+    const string QUEST_INDEX_KEY = "QuestIndex";
+    const string QUEST_PROGRESS_KEY = "QuestProgress";
+
     private void Awake()
     {
-        Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void Start()
     {
-        GiveNextQuest();
+        LoadQuest(); // ?? BURASI DEÐÝÞTÝ
     }
 
+    // ?? Yeni quest verme
     public void GiveNextQuest()
     {
         if (questIndex >= questPool.Count)
@@ -35,10 +47,49 @@ public class QuestManager : MonoBehaviour
         };
 
         questIndex++;
+
+        SaveQuest(); // ?? yeni quest gelince kaydet
     }
 
+    // ?? Enemy öldüðünde
     public void OnEnemyKilled(EnemyData enemyData)
     {
         currentQuest?.AddProgress(enemyData);
+        SaveQuest(); // ?? progress kaydet
+    }
+
+    // ?? SAVE
+    public void SaveQuest()
+    {
+        if (currentQuest == null) return;
+
+        PlayerPrefs.SetInt(QUEST_INDEX_KEY, questIndex - 1);
+        PlayerPrefs.SetInt(QUEST_PROGRESS_KEY, currentQuest.currentAmount);
+
+        PlayerPrefs.Save();
+    }
+
+    // ?? LOAD
+    public void LoadQuest()
+    {
+        if (PlayerPrefs.HasKey(QUEST_INDEX_KEY))
+        {
+            int savedIndex = PlayerPrefs.GetInt(QUEST_INDEX_KEY);
+            int savedProgress = PlayerPrefs.GetInt(QUEST_PROGRESS_KEY);
+
+            questIndex = savedIndex;
+
+            currentQuest = new QuestRuntime
+            {
+                data = questPool[questIndex],
+                currentAmount = savedProgress
+            };
+
+            questIndex++; // sýradaki quest için
+        }
+        else
+        {
+            GiveNextQuest(); // ilk oyun
+        }
     }
 }
