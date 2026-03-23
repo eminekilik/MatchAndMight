@@ -13,6 +13,10 @@ public class QuestManager : MonoBehaviour
     const string QUEST_INDEX_KEY = "QuestIndex";
     const string QUEST_PROGRESS_KEY = "QuestProgress";
 
+    [HideInInspector] public int pendingRewardXP = 0;
+    [HideInInspector] public bool hasPendingReward = false;
+
+
     private void Awake()
     {
         if (Instance == null)

@@ -27,7 +27,8 @@ public class QuestRuntime
         isCompleted = true;
         Debug.Log("Quest Completed: " + data.questName);
 
-        PlayerLevelSystem.Instance.AddXP(data.rewardXP);
+        QuestManager.Instance.pendingRewardXP = data.rewardXP;
+        QuestManager.Instance.hasPendingReward = true;
 
         QuestManager.Instance.GiveNextQuest();
         QuestManager.Instance.SaveQuest();
