@@ -41,6 +41,7 @@ public class QuestManager : MonoBehaviour
         if (questIndex >= questPool.Count)
         {
             Debug.Log("All quests completed!");
+            currentQuest = null;
             return;
         }
 

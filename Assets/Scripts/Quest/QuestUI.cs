@@ -11,7 +11,12 @@ public class QuestUI : MonoBehaviour
     {
         var quest = QuestManager.Instance.currentQuest;
 
-        if (quest == null) return;
+        if (quest == null)
+        {
+            questText.text = "All Quests Completed";
+            targetImage.enabled = false; // iconu gizle (opsiyonel)
+            return;
+        }
 
         questText.text =
     $"{quest.data.questName} ({quest.currentAmount}/{quest.data.requiredAmount})";

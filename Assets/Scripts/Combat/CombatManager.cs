@@ -110,6 +110,7 @@ public class CombatManager : MonoBehaviour
         switch (type)
         {
             case GemType.Red:
+            case GemType.Gray:
                 int totalDamage = redDamage + (count - 3);
 
                 bool usedManaPower = false;

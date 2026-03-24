@@ -143,5 +143,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c88d0f809e8ae4a4398470a30e71408f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gemType: 0
+  gemType: 3
   currentTile: {fileID: 0}

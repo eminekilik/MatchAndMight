@@ -76,12 +76,36 @@ public class PlayerLevelSystem : MonoBehaviour
             pendingXP = 0;
             shouldAnimateXP = false;
         }
+
+        // QUEST PANELÝ
+        if (QuestManager.Instance.hasPendingReward)
+        {
+            var questPanel = FindObjectOfType<QuestCompletePanel>(true);
+            if (questPanel != null)
+            {
+                questPanel.OpenPanel(QuestManager.Instance.pendingRewardXP);
+            }
+        }
     }
 
     public void AddXP(int amount)
     {
         pendingXP += amount;
         shouldAnimateXP = true;
+    }
+
+    public void AddXPWithAnimate(int amount)
+    {
+        pendingXP += amount;
+        shouldAnimateXP = true;
+
+        // XP Slider hazýrsa anýnda animasyonu baþlat
+        if (xpSlider != null)
+        {
+            StartCoroutine(AnimateXP(pendingXP));
+            pendingXP = 0;
+            shouldAnimateXP = false;
+        }
     }
 
     System.Collections.IEnumerator AnimateXP(int amount)
