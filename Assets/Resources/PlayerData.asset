@@ -19,8 +19,8 @@ MonoBehaviour:
   attackPerLevel: 2
   manaPerLevel: 2
   bonusHealth: 0
-  bonusAttack: 3
-  bonusMana: 3
-  currentHealth: 110
-  currentAttack: 12
-  currentManaGain: 12
+  bonusAttack: 0
+  bonusMana: 0
+  currentHealth: 105
+  currentAttack: 10
+  currentManaGain: 7

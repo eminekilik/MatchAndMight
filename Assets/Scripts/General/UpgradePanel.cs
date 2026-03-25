@@ -17,18 +17,21 @@ public class UpgradePanel : MonoBehaviour
     public void UpgradeHealth()
     {
         CombatManager.Instance.playerData.bonusHealth += healthUpgrade;
+        ApplyStats();
         ClosePanel();
     }
 
     public void UpgradeAttack()
     {
         CombatManager.Instance.playerData.bonusAttack += attackUpgrade;
+        ApplyStats();
         ClosePanel();
     }
 
     public void UpgradeMana()
     {
         CombatManager.Instance.playerData.bonusMana += manaUpgrade;
+        ApplyStats();
         ClosePanel();
     }
 
@@ -36,5 +39,11 @@ public class UpgradePanel : MonoBehaviour
     {
         panel.SetActive(false);
         //Time.timeScale = 1f;
+    }
+
+    void ApplyStats()
+    {
+        var playerData = CombatManager.Instance.playerData;
+        playerData.RecalculateStats(PlayerLevelSystem.Instance.level);
     }
 }
