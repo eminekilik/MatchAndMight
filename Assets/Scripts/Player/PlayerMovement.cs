@@ -51,22 +51,38 @@ public class PlayerMovement : MonoBehaviour
     }
 
     void HandleInput()
+{
+    if (Input.GetMouseButton(0))
     {
-        if (Input.GetMouseButton(0))
+        if (EventSystem.current.IsPointerOverGameObject())
+            return;
+
+        Vector2 worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+
+        PlayerTreeInteraction treeInteraction = GetComponent<PlayerTreeInteraction>();
+
+        // Eðer Player yakýnýnda aðaç varsa ve týklanan þey o aðaçsa
+        if (treeInteraction.CurrentTree != null)
         {
-            if (EventSystem.current.IsPointerOverGameObject())
+            Collider2D treeCollider = treeInteraction.CurrentTree.GetComponent<Collider2D>();
+
+            if (treeCollider == Physics2D.OverlapPoint(worldPoint))
+            {
+                // Aðaca yakýn ve týklamýþ ? kes
+                treeInteraction.TryCut();
+                isMoving = false;
                 return;
-
-            Vector2 worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-
-            targetPosition = worldPoint;
-            isMoving = true;
+            }
         }
-        else
-        {
-            isMoving = false;
-        }
+
+        // Normal yere týklamýþ ? hareket et
+        targetPosition = worldPoint;
+        isMoving = true;
+
+        if (treeInteraction != null)
+            treeInteraction.animator.SetBool("isCutting", false);
     }
+}
 
     void HandleMovement()
     {
