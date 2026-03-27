@@ -51,38 +51,42 @@ public class PlayerMovement : MonoBehaviour
     }
 
     void HandleInput()
-{
-    if (Input.GetMouseButton(0))
     {
-        if (EventSystem.current.IsPointerOverGameObject())
-            return;
+        bool isCuttingNow = false;
 
-        Vector2 worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
-
-        PlayerTreeInteraction treeInteraction = GetComponent<PlayerTreeInteraction>();
-
-        // Eðer Player yakýnýnda aðaç varsa ve týklanan þey o aðaçsa
-        if (treeInteraction.CurrentTree != null)
+        if (Input.GetMouseButton(0))
         {
-            Collider2D treeCollider = treeInteraction.CurrentTree.GetComponent<Collider2D>();
-
-            if (treeCollider == Physics2D.OverlapPoint(worldPoint))
-            {
-                // Aðaca yakýn ve týklamýþ ? kes
-                treeInteraction.TryCut();
-                isMoving = false;
+            if (EventSystem.current.IsPointerOverGameObject())
                 return;
+
+            Vector2 worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
+
+            PlayerTreeInteraction treeInteraction = GetComponent<PlayerTreeInteraction>();
+
+            if (treeInteraction.CurrentTree != null)
+            {
+                Collider2D hit = Physics2D.OverlapPoint(worldPoint);
+
+                if (hit != null && hit.GetComponent<Tree>() == treeInteraction.CurrentTree)
+                {
+                    treeInteraction.animator.SetTrigger("Cut");
+                    isMoving = false;
+                    return; // ?? KRÝTÝK
+                }
+            }
+
+            // SADECE kesmiyorsak hareket et
+            if (!isCuttingNow)
+            {
+                targetPosition = worldPoint;
+                isMoving = true;
+            }
+            else
+            {
+                isMoving = false;
             }
         }
-
-        // Normal yere týklamýþ ? hareket et
-        targetPosition = worldPoint;
-        isMoving = true;
-
-        if (treeInteraction != null)
-            treeInteraction.animator.SetBool("isCutting", false);
     }
-}
 
     void HandleMovement()
     {
