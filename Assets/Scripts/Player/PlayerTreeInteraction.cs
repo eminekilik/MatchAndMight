@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class PlayerTreeInteraction : MonoBehaviour
@@ -16,19 +17,19 @@ public class PlayerTreeInteraction : MonoBehaviour
         {
             if (currentTree != null)
             {
-                animator.SetTrigger("Cut");
+                //animator.SetTrigger("Cut");
                 isHolding = true;
             }
         }
 
         // Mouse basýlý tutuluyor
-        if (Input.GetMouseButton(0))
-        {
-            if (currentTree != null)
-            {
-                isHolding = true;
-            }
-        }
+        //if (Input.GetMouseButton(0))
+        //{
+        //    if (currentTree != null)
+        //    {
+        //        isHolding = true;
+        //    }
+        //}
 
         // Mouse býrakýldý
         if (Input.GetMouseButtonUp(0))
@@ -40,10 +41,28 @@ public class PlayerTreeInteraction : MonoBehaviour
     // Animasyonun sonuna event koyacaksýn
     public void OnCutAnimationEnd()
     {
-        if (isHolding && currentTree != null)
+        if (currentTree != null)
         {
-            animator.SetTrigger("Cut");
+            HitTree(); // sadece damage burada
         }
+    }
+    private bool isCutting = false;
+
+    public void StartCutting()
+    {
+        if (currentTree == null) return;
+        if (isCutting) return; // ?? spam engelle
+
+        isCutting = true;
+        animator.SetTrigger("Cut");
+
+        StartCoroutine(ResetCutting());
+    }
+
+    private IEnumerator ResetCutting()
+    {
+        yield return new WaitForSeconds(0.5f); // animasyon sürene göre ayarla
+        isCutting = false;
     }
 
     public void TryCut()

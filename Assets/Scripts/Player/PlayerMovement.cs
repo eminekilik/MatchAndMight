@@ -52,8 +52,6 @@ public class PlayerMovement : MonoBehaviour
 
     void HandleInput()
     {
-        bool isCuttingNow = false;
-
         if (Input.GetMouseButton(0))
         {
             if (EventSystem.current.IsPointerOverGameObject())
@@ -62,28 +60,32 @@ public class PlayerMovement : MonoBehaviour
             Vector2 worldPoint = mainCamera.ScreenToWorldPoint(Input.mousePosition);
 
             PlayerTreeInteraction treeInteraction = GetComponent<PlayerTreeInteraction>();
+            Tree currentTree = treeInteraction.CurrentTree;
 
-            if (treeInteraction.CurrentTree != null)
+            bool isCuttingNow = false;
+
+            // Eðer yakýnýndaki aðaç var ve týklanan nokta aðaç collider'ýna giriyorsa
+            if (currentTree != null)
             {
-                Collider2D hit = Physics2D.OverlapPoint(worldPoint);
-
-                if (hit != null && hit.GetComponent<Tree>() == treeInteraction.CurrentTree)
+                Collider2D treeCollider = currentTree.GetComponent<Collider2D>();
+                if (treeCollider == Physics2D.OverlapPoint(worldPoint))
                 {
-                    treeInteraction.animator.SetTrigger("Cut");
+                    // Kesme baþlat
+                    //treeInteraction.OnCutAnimationEnd();
+                    //isCuttingNow = true;
+                    treeInteraction.StartCutting();
+
+                    // Karakter hareket etmesin
                     isMoving = false;
-                    return; // ?? KRÝTÝK
+                    return; // erken return ile hareket hedefi deðiþtirilmesin
                 }
             }
 
-            // SADECE kesmiyorsak hareket et
+            // Eðer kesme baþlatýlmadýysa normal hareket
             if (!isCuttingNow)
             {
                 targetPosition = worldPoint;
                 isMoving = true;
-            }
-            else
-            {
-                isMoving = false;
             }
         }
     }
