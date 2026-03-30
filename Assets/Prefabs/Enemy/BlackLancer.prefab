@@ -220,7 +220,7 @@ GameObject:
   - component: {fileID: 6312950747174973845}
   - component: {fileID: 4014193664946071458}
   - component: {fileID: 1479436300587546952}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BlackLancer
   m_TagString: Enemy
   m_Icon: {fileID: 0}

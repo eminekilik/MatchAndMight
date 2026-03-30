@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 6312950747174973845}
   - component: {fileID: 2010736335358474481}
   - component: {fileID: 4677126728111985848}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BlackWarrior
   m_TagString: Enemy
   m_Icon: {fileID: 0}

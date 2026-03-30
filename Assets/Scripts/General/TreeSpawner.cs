@@ -16,6 +16,10 @@ public class TreeSpawner : MonoBehaviour
 
     private List<Vector3> usedPositions = new List<Vector3>();
 
+    [Header("Collision Check")]
+    public LayerMask enemyLayer;
+    public float checkRadius = 1f;
+
     void Start()
     {
         SpawnTrees();
@@ -82,11 +86,17 @@ public class TreeSpawner : MonoBehaviour
 
     bool IsPositionValid(Vector3 pos)
     {
+        // Diðer aðaçlarla çakýþma
         foreach (Vector3 usedPos in usedPositions)
         {
             if (Vector3.Distance(pos, usedPos) < minDistanceBetweenTrees)
                 return false;
         }
+
+        // Düþman var mý kontrolü
+        Collider2D hit = Physics2D.OverlapCircle(pos, checkRadius, enemyLayer);
+        if (hit != null)
+            return false;
 
         return true;
     }

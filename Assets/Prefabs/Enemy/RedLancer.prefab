@@ -220,7 +220,7 @@ GameObject:
   - component: {fileID: 6312950747174973845}
   - component: {fileID: -5774689750754745917}
   - component: {fileID: 7386853497595746897}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: RedLancer
   m_TagString: Enemy
   m_Icon: {fileID: 0}

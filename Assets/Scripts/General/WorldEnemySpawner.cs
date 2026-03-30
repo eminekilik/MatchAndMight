@@ -16,6 +16,9 @@ public class WorldEnemySpawner : MonoBehaviour
 
     private List<Vector3> usedPositions = new List<Vector3>();
 
+    public LayerMask treeLayer;
+    public float checkRadius = 1f;
+
     void Start()
     {
         SpawnEnemies();
@@ -85,6 +88,10 @@ public class WorldEnemySpawner : MonoBehaviour
             if (Vector3.Distance(pos, usedPos) < minDistanceBetweenEnemies)
                 return false;
         }
+
+        Collider2D hit = Physics2D.OverlapCircle(pos, checkRadius, treeLayer);
+        if (hit != null)
+            return false;
 
         return true;
     }

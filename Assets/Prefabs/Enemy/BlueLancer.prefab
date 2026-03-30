@@ -90,7 +90,7 @@ GameObject:
   - component: {fileID: 6312950747174973845}
   - component: {fileID: -5800664438673781286}
   - component: {fileID: 9042252568043223134}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: BlueLancer
   m_TagString: Enemy
   m_Icon: {fileID: 0}

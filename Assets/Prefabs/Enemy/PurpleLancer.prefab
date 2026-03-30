@@ -220,7 +220,7 @@ GameObject:
   - component: {fileID: 6312950747174973845}
   - component: {fileID: 2651809531805761142}
   - component: {fileID: 4714413950509916890}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PurpleLancer
   m_TagString: Enemy
   m_Icon: {fileID: 0}
