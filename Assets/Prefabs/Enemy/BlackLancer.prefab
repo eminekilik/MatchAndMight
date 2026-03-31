@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 5359490203354784124}
   - component: {fileID: 5917005731876113619}
   - component: {fileID: 5115796927286198342}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Fight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -140,7 +140,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3236091635940667300}
   - component: {fileID: 1610284041457081203}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Collider
   m_TagString: Untagged
   m_Icon: {fileID: 0}
