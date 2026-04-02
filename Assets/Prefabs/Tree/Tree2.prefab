@@ -20,6 +20,10 @@ PrefabInstance:
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 5354429476588687777, guid: 3b3745d65073b4ba1a9da4c2861fd353, type: 3}
+    - target: {fileID: 6227596350727847992, guid: f8dc97040b4a07b4fbbf718c45f051d2, type: 3}
+      propertyPath: treeCollider
+      value: 
+      objectReference: {fileID: 831352306448686010}
     - target: {fileID: 7837402985037215022, guid: f8dc97040b4a07b4fbbf718c45f051d2, type: 3}
       propertyPath: m_Name
       value: Tree2
@@ -69,3 +73,8 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f8dc97040b4a07b4fbbf718c45f051d2, type: 3}
+--- !u!61 &831352306448686010 stripped
+BoxCollider2D:
+  m_CorrespondingSourceObject: {fileID: 2707411476913874516, guid: f8dc97040b4a07b4fbbf718c45f051d2, type: 3}
+  m_PrefabInstance: {fileID: 3322291895028628974}
+  m_PrefabAsset: {fileID: 0}

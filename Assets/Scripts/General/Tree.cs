@@ -6,9 +6,15 @@ public class Tree : MonoBehaviour
     private int currentHealth;
     public bool IsDestroyed { get; private set; } = false;
 
+    private Animator animator; // EKLENDÝ
+
+    [Header("Collider Reference")]
+    public BoxCollider2D treeCollider;
+
     void Start()
     {
         currentHealth = maxHealth;
+        animator = GetComponent<Animator>(); // EKLENDÝ
     }
 
     public void Hit()
@@ -16,6 +22,7 @@ public class Tree : MonoBehaviour
         if (IsDestroyed) return;
 
         currentHealth--;
+
         if (currentHealth <= 0)
         {
             CutDown();
@@ -26,6 +33,18 @@ public class Tree : MonoBehaviour
     {
         IsDestroyed = true;
         Debug.Log("Aðaç kesildi");
-        Destroy(gameObject);
+
+        animator.SetTrigger("Cut"); // Destroy yerine animasyon
+        ShrinkCollider();
+    }
+
+    void ShrinkCollider()
+    {
+        treeCollider.size = new Vector2(0.5f, treeCollider.size.y * 0.3f);
+        treeCollider.offset = new Vector2(treeCollider.offset.x, treeCollider.offset.y - 1.8f);
+
+        Collider2D parentCol = GetComponent<Collider2D>();
+        if (parentCol != null)
+            parentCol.enabled = false;
     }
 }

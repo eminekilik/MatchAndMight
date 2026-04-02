@@ -199,6 +199,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 5
+  treeCollider: {fileID: 2707411476913874516}
 --- !u!61 &2421507868725240100
 BoxCollider2D:
   m_ObjectHideFlags: 0
