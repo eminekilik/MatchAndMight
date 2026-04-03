@@ -22,6 +22,9 @@ public class PlayerMovement : MonoBehaviour
 
     private Vector2 lastPosition;
 
+    private float stuckTimer = 0f;
+    public float stuckTimeThreshold = 0.2f; // 0.2 saniye bekle
+
     void Start()
     {
         mainCamera = Camera.main;
@@ -95,6 +98,7 @@ public class PlayerMovement : MonoBehaviour
         if (!isMoving)
         {
             rb.velocity = Vector2.zero;
+            stuckTimer = 0f;
             return;
         }
 
@@ -115,6 +119,7 @@ public class PlayerMovement : MonoBehaviour
         if (distance <= stopDistance)
         {
             rb.velocity = Vector2.zero;
+            isMoving = false;
         }
 
         // Enemy kontrolü aynen kalsýn
@@ -134,8 +139,32 @@ public class PlayerMovement : MonoBehaviour
 
     void UpdateAnimation()
     {
-        float speed = rb.velocity.magnitude;
-        animator.SetBool("isWalking", speed > 0.05f);
+        float movedDistance = Vector2.Distance(rb.position, lastPosition);
+
+        bool isActuallyMoving = movedDistance > 0.001f;
+
+        animator.SetBool("isWalking", isActuallyMoving);
+
+        if (isMoving)
+        {
+            if (!isActuallyMoving)
+            {
+                stuckTimer += Time.fixedDeltaTime;
+
+                if (stuckTimer >= stuckTimeThreshold)
+                {
+                    isMoving = false;
+                    rb.velocity = Vector2.zero;
+                    stuckTimer = 0f;
+                }
+            }
+            else
+            {
+                stuckTimer = 0f;
+            }
+        }
+
+        lastPosition = rb.position;
     }
 
     void StartBattle()
