@@ -7,6 +7,8 @@ public class Tree : MonoBehaviour
     public bool IsDestroyed { get; private set; } = false;
 
     private Animator animator; // EKLENDÝ
+    public int woodAmount = 1; // aðaç baþýna odun
+
 
     [Header("Collider Reference")]
     public BoxCollider2D treeCollider;
@@ -35,6 +37,7 @@ public class Tree : MonoBehaviour
         Debug.Log("Aðaç kesildi");
 
         animator.SetTrigger("Cut"); // Destroy yerine animasyon
+        WoodManager.Instance.AddWood(woodAmount);
         ShrinkCollider();
     }
 
