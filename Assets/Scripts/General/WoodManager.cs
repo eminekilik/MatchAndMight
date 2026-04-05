@@ -22,6 +22,6 @@ public class WoodManager : MonoBehaviour
 
     void UpdateUI()
     {
-        woodText.text = "Odun: " + totalWood;
+        woodText.text = totalWood.ToString();
     }
 }
