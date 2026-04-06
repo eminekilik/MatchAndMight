@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class Tree : MonoBehaviour
@@ -39,6 +40,7 @@ public class Tree : MonoBehaviour
         animator.SetTrigger("Cut"); // Destroy yerine animasyon
         WoodManager.Instance.AddWood(woodAmount);
         ShrinkCollider();
+        StartCoroutine(DestroyAfterDelay());
     }
 
     void ShrinkCollider()
@@ -49,5 +51,11 @@ public class Tree : MonoBehaviour
         Collider2D parentCol = GetComponent<Collider2D>();
         if (parentCol != null)
             parentCol.enabled = false;
+    }
+
+    IEnumerator DestroyAfterDelay()
+    {
+        yield return new WaitForSeconds(3f);
+        Destroy(gameObject);
     }
 }
