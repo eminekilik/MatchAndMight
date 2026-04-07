@@ -20,9 +20,32 @@ public class TreeSpawner : MonoBehaviour
     public LayerMask enemyLayer;
     public float checkRadius = 1f;
 
+    // EKLENDÝ
+    private List<GameObject> activeTrees = new List<GameObject>();
+
     void Start()
     {
         SpawnTrees();
+    }
+
+    void Update()
+    {
+        // Silinmiþ aðaçlarý listeden temizle
+        activeTrees.RemoveAll(tree => tree == null);
+
+        // usedPositions'ý güncelle (sadece yaþayan aðaçlar)
+        usedPositions.Clear();
+        foreach (var tree in activeTrees)
+        {
+            if (tree != null)
+                usedPositions.Add(tree.transform.position);
+        }
+
+        // Eksik varsa tamamla
+        if (activeTrees.Count < treeCount)
+        {
+            SpawnMissingTrees(treeCount - activeTrees.Count);
+        }
     }
 
     void SpawnTrees()
@@ -59,7 +82,23 @@ public class TreeSpawner : MonoBehaviour
         foreach (var tree in spawnPool)
         {
             Vector3 randomPos = GetRandomPosition();
-            Instantiate(tree, randomPos, Quaternion.identity);
+            GameObject spawnedTree = Instantiate(tree, randomPos, Quaternion.identity);
+
+            // EKLENDÝ
+            activeTrees.Add(spawnedTree);
+        }
+    }
+
+    void SpawnMissingTrees(int amount)
+    {
+        for (int i = 0; i < amount; i++)
+        {
+            GameObject randomTree = treePrefabs[Random.Range(0, treePrefabs.Length)];
+
+            Vector3 randomPos = GetRandomPosition();
+            GameObject spawnedTree = Instantiate(randomTree, randomPos, Quaternion.identity);
+
+            activeTrees.Add(spawnedTree);
         }
     }
 
